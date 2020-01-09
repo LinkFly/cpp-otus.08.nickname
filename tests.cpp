@@ -6,8 +6,7 @@
 #include <iostream>
 #include <functional>
 #include <ctime>
-/*#include <map>
-#include <numeric>*/
+#include <sstream>
 
 #include "nickname.h"
 
@@ -19,7 +18,6 @@ using std::clock;
 bool call_test(string name, std::function<bool(void)> fntest) {
 	cout << "------------------------------\n";
 	cout << endl << name << ":\n";
-	//test_data test_data = create_test_data();
 
 	auto startTime = clock();
 	bool res = fntest();
@@ -30,11 +28,19 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 	return res;
 }
 
-bool test_nickname() {
-	const int count = 10000;
+bool trivial_test_radix_trie() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-
-		return true;
+		std::ostringstream sout, sout2;
+		RadixTrie<> rtree;
+		rtree.append("mark");
+		rtree.append("mast");
+		rtree.printTree(sout);
+		rtree.print(sout2);
+		auto res1 = sout.str();
+		auto res2 = sout2.str();
+		string waitRes1 = "ma\n\trk\n\t\st\n";
+		string waitRes2 = "mark mar\nmast mas\n";
+		return res1 == waitRes1 && res2 == waitRes2;
 	});
 }
 
@@ -51,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(allocator_test_suite)
 
 BOOST_AUTO_TEST_CASE(test_of_nickname)
 {
-	BOOST_CHECK(test_nickname());
+	BOOST_CHECK(trivial_test_radix_trie());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
