@@ -5,7 +5,7 @@
 #include <locale>
 
 // tmp
-#include <bitset>
+//#include <bitset>
 
 #include "nickname.h"
 
@@ -15,7 +15,7 @@ using std::string;
 
 int main() {
 	setlocale(LC_ALL, "Russian");
-	RadixTrie<> rtree;
+	RadixTrie rtree;
 	rtree.append(L"mark");
 	rtree.append(L"mast");
 	rtree.append(L"Марк");

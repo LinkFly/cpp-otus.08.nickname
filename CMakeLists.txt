@@ -7,6 +7,7 @@ set(SOURCES
 set(HEADERS
 	share.h
 	logger.h
+	node.h
 	nickname.h
 	)
 set(DATA_FILES
