@@ -9,6 +9,7 @@ set(HEADERS
 	logger.h
 	node.h
 	nickname.h
+	codepage-manager.h
 	)
 set(DATA_FILES
 

@@ -10,7 +10,7 @@
 
 #include "nickname.h"
 
-using std::string;
+using std::wstring;
 using std::cout;
 using std::endl;
 using std::clock;
@@ -30,18 +30,17 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 
 bool trivial_test_radix_trie() {
 	return call_test(__PRETTY_FUNCTION__, []() {
-		std::ostringstream sout, sout2;
-		RadixTrie<> rtree;
+		std::wostringstream sout, sout2;
+		RadixTrie rtree;
 		rtree.append(L"mark");
 		rtree.append(L"mast");
-		/*rtree.printTree(sout);
+		rtree.printTree(sout);
 		rtree.print(sout2);
 		auto res1 = sout.str();
 		auto res2 = sout2.str();
-		string waitRes1 = "ma\n\trk\n\tst\n";
-		string waitRes2 = "mark mar\nmast mas\n";
-		return res1 == waitRes1 && res2 == waitRes2;*/
-		return true;
+		wstring waitRes1 = L"ma\n\trk$\n\tst$\n";
+		wstring waitRes2 = L"mark mar\nmast mas\n";
+		return res1 == waitRes1 && res2 == waitRes2;
 	});
 }
 
@@ -52,21 +51,22 @@ bool utf8_test_radix_trie() {
 Даша - Даш
 */
 	return call_test(__PRETTY_FUNCTION__, []() {
-		std::ostringstream sout, sout2;
-		RadixTrie<> rtree;
+		std::wostringstream sout, sout2;
+		RadixTrie rtree;
 		rtree.append(L"Данил");
-		std::wstring str{ L"Данил" };
-		cout << "!!!!!!!!!!!!!!!!!!  " << str[0] << str[2] << " " << (int)(unsigned char)(str[2]) << endl;
-		/*rtree.append("mast");
-		rtree.append("mast");
+		rtree.append(L"Денис");
+		rtree.append(L"Даша");
+
 		rtree.printTree(sout);
 		rtree.print(sout2);
 		auto res1 = sout.str();
 		auto res2 = sout2.str();
-		string waitRes1 = "ma\n\trk\n\t\st\n";
-		string waitRes2 = "mark mar\nmast mas\n";
-		return res1 == waitRes1 && res2 == waitRes2;*/
-		return true;
+		wcout << endl << res1 << endl << res2 << endl;
+		wcout << L"\nSDFDSF - ADFAd\n";
+		wcout.flush();
+		wstring waitRes1 = L"д\n\tа\n\t\tнил$\n\t\tша$\n\tенис$\n";
+		wstring waitRes2 = L"данил дан\nдаша даш\nденис де\n";
+		return res1 == waitRes1 && res2 == waitRes2;
 		});
 }
 

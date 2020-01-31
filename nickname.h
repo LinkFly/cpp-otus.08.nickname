@@ -20,9 +20,13 @@ wstring upFirstChar(wstring str) {
 	return wstring{ std::towupper(str[0]) } +str.substr(1);
 }
 
+const wchar_t GAP_END = L'└';
+const wchar_t GAP_HERE = L'├';
+const wchar_t GAP_NEXT = L'│';
+
 class RadixTrie {
 	std::unique_ptr<Node> root;
-
+	
 	// TODO! Поискать стандартную ф-ию перевода широких строк к нижнему регистру (также поискать в boost'e)
 	static wstring tolower(wstring label) {
 		std::transform(label.begin(), label.end(), label.begin(), [](wchar_t ch) -> wchar_t {
@@ -42,10 +46,10 @@ class RadixTrie {
 		return label;
 	}
 
-public:
 	static void append(std::unique_ptr<Node>& node, const wstring& initLabel) {
 		// prepare label
 		wstring label = tolower(initLabel);
+
 		if (node.get() == nullptr) {
 			node.reset(new Node());
 			node->label = label;
@@ -55,15 +59,18 @@ public:
 
 		bool isNoChildren = node->isNoChildren();
 
-		if (node->label == L"" && isNoChildren) {
-			node->label = label;
-			node->isEnd = true;
+		if (node->label == L"") {
+			if (isNoChildren) {
+				node->label = label;
+				node->isEnd = true;
+			}
+			else {
+				append(node->getNode(label[0]), label);
+			}
 			return;
+
 		}
-		else if (node->label == L"" && !isNoChildren) {
-			// TODO!!!!!
-		}
-		
+
 		auto pair = std::mismatch(label.begin(), label.end(), node->label.begin(), node->label.end());
 		// Iterators to not equal symbols
 		auto st1 = std::get<0>(pair);
@@ -130,59 +137,68 @@ public:
 					// in newNode now - node, require fix name
 					auto& oldRoot = newNode;
 					node->setNode(oldRoot->label[0], oldRoot);
-					
+
 				}
 			}
 		}
 	}
-	static void printTree(std::wostream& out, std::unique_ptr<Node>& node, int level = 0) {
-		printGap(out, level);
+
+	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, int level = 0, bool isLast = false) {
+		//const bool isNoChildren = node->isNoChildren();
+		printGap(out, level, isLast);
 		wstring endMark = node->isEnd ? L"$" : L"";
-		out << node->label << endMark << L'\n';
-		node->forEach([&level, &out](std::unique_ptr<Node>& node, [[maybe_unused]] int idx) {
-			printTree(out, node, level + 1);
+		out << (isOutQuotes ? L"\"" : L"") << node->label << (isOutQuotes ? L"\"" : L"") << endMark << L'\n';
+		node->forEach([this, &level, &out](std::unique_ptr<Node>& node, [[maybe_unused]] int idx, bool isLast) {
+			_printTree(out, node, level + 1, isLast);
 			});
 	}
-	
-	static void print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"", bool upFstChar = false) {
+	// For _printTree
+	void printGap(std::wostream& out, int n, bool isLast) {
+		while (n--) {
+			if (isOutSpecForDeps) {
+				auto curGap = isLast ? GAP_END : GAP_HERE;
+				out << curGap;
+			}
+			out << (isWriteSpecToBeginGap ? sGap.substr(1) : sGap);
+		}
+	}
+
+	void _print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"") {
 		if (path == L"") {
 			path = node->label;
 		}
 		wstring curLabel = label + node->label;
 		if (node->isNoChildren()) {
-			if (!upFstChar) {
+			if (!isUpFstCharOnPrint) {
 				out << curLabel << " " << path << endl;
 			}
 			else {
 				out << upFirstChar(curLabel) << " " << upFirstChar(path) << endl;
 			}
 		}
-		node->forEach([&path, &curLabel, &out](std::unique_ptr<Node>& node, int idx) {
+		node->forEach([this, &path, &curLabel, &out](std::unique_ptr<Node>& node, int idx, bool isLast) {
 			wchar_t ch = Node::getChar(idx);
 			wstring curPath = curLabel + wstring{ ch };
-			print(out, node, curLabel, curPath);
-		});
+			_print(out, node, curLabel, curPath);
+			});
 	}
+
+public:
+	// Config (set it after create instance)
+	bool isOutQuotes = false;
+	bool isOutSpecForDeps = false;
+	bool isUpFstCharOnPrint = false;
+	wstring sGap = L"\t";
+	bool isWriteSpecToBeginGap = true;
 
 	void append(const wstring& label) {
 		append(root, label);
 	}
 	void printTree(std::wostream& out = wcout) {
-		printTree(out, root);
+		_printTree(out, root);
 	}
-	void print(std::wostream& out = wcout, bool upFstChar = false) {
-		print(out, root, L"", L"", upFstChar);
-	}
-
-private:
-	static void add(std::unique_ptr<Node>& node, const wstring& label) {
-		char fstChar = label[0];
-
-	}
-	static void printGap(std::wostream& out, int n) {
-		while (n--) {
-			out << L'\t';
-		}
+	void print(std::wostream& out = wcout) {
+		_print(out, root, L"", L"");
 	}
 	
 };

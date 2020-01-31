@@ -31,10 +31,13 @@ struct Node {
 			return children[idx];
 		}
 	}
-	void forEach(std::function<void(std::unique_ptr<Node>&, int idx)> fn) {
+	void forEach(std::function<void(std::unique_ptr<Node>&, int idx, bool isLast)> fn) {
+		auto count = busySet.count();
+		decltype(count) order = 0;
 		for (int i = 0; i < busySet.size(); ++i) {
 			if (busySet[i]) {
-				fn(children[i], i);
+				order++;
+				fn(children[i], i, order == count);
 			}
 		}
 	}
