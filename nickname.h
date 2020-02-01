@@ -155,11 +155,16 @@ class RadixTrie {
 	// For _printTree
 	void printGap(std::wostream& out, int n, bool isLast) {
 		while (n--) {
+			auto curGap = GAP_END;
 			if (isOutSpecForDeps) {
-				auto curGap = isLast ? GAP_END : GAP_HERE;
-				out << curGap;
+				if (n == 0) {
+					curGap = isLast ? GAP_END : GAP_HERE;
+				}
+				else {
+					curGap = GAP_NEXT;
+				}
 			}
-			out << (isWriteSpecToBeginGap ? sGap.substr(1) : sGap);
+			out << curGap << (isWriteSpecToBeginGap ? sGap.substr(1) : sGap);
 		}
 	}
 
