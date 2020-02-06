@@ -12,6 +12,7 @@ struct Node {
 	wstring label;
 	bool isEnd{};
 	std::array<std::unique_ptr<Node>, size> children;
+	// TODO!! Пересмотреть использовать bitset'a
 	std::bitset<size> busySet = 0;
 
 	std::unique_ptr<Node>& getNode(wchar_t ch = 0) {

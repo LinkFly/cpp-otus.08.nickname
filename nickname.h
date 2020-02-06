@@ -2,11 +2,11 @@
 
 #include "share.h"
 
-
 #include <iostream>
 #include <algorithm>
 #include <functional>
 #include <cwctype>
+//#include <stack>
 
 #include "node.h"
 
@@ -143,29 +143,40 @@ class RadixTrie {
 		}
 	}
 
-	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, int level = 0, bool isLast = false) {
+	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, bool topLevel = true, /*int level = 0, */bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
 		//const bool isNoChildren = node->isNoChildren();
-		printGap(out, level, isLast);
+		/*if (node->label != L"") {*/
+		if (!topLevel) {
+			printGap(out, topLevel, isLast, parentLines);
+			parentLines.push_back(!isLast);
+		}
 		wstring endMark = node->isEnd ? L"$" : L"";
 		out << (isOutQuotes ? L"\"" : L"") << node->label << (isOutQuotes ? L"\"" : L"") << endMark << L'\n';
-		node->forEach([this, &level, &out](std::unique_ptr<Node>& node, [[maybe_unused]] int idx, bool isLast) {
-			_printTree(out, node, level + 1, isLast);
+		/*node->forEach([this, &level, &out, &parentLines](*/
+		node->forEach([this, &topLevel, &out, &parentLines](
+			std::unique_ptr<Node>& node, [[maybe_unused]] int idx, bool isLast) {
+			_printTree(out, node, false, /*level + 1, */isLast, parentLines);
 			});
+		/*if (node->label != L"") {*/
+		if (!topLevel) {
+			parentLines.pop_back();
+		}
 	}
 	// For _printTree
-	void printGap(std::wostream& out, int n, bool isLast) {
-		while (n--) {
-			auto curGap = GAP_END;
+	void printGap(std::wostream& out, bool topLevel, /*int gapCount, */bool isLast, std::vector<bool> parentLines) {
+		bool isCorrectGap = isOutSpecForDeps && isWriteSpecToBeginGap;
+		for (bool isNext : parentLines) {
 			if (isOutSpecForDeps) {
-				if (n == 0) {
-					curGap = isLast ? GAP_END : GAP_HERE;
-				}
-				else {
-					curGap = GAP_NEXT;
+				if (isNext) {
+					out << GAP_NEXT;
 				}
 			}
-			out << curGap << (isWriteSpecToBeginGap ? sGap.substr(1) : sGap);
+			out << (isCorrectGap && isNext ? sGap.substr(1) : sGap);
 		}
+		if (isOutSpecForDeps) {
+			out << (isLast ? GAP_END : GAP_HERE);
+		}
+		out << (isCorrectGap ? sGap.substr(1) : sGap);
 	}
 
 	void _print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"") {

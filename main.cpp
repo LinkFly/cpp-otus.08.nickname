@@ -1,9 +1,6 @@
 ﻿#include "share.h"
 
 #include <iostream>
-//// Configs
-#define AUTO_CHANGE_CODEPAGE_FOR_WIN 1
-//// end Configs
 
 #include <string>
 #include <locale>
@@ -15,10 +12,6 @@
 using std::cout;
 using std::endl;
 using std::string;
-
-#ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
-#include "codepage-manager.h"
-#endif
 
 struct InOutInit {
 	std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
