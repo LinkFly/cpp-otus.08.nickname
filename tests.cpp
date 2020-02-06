@@ -45,7 +45,7 @@ void addTestNames(RadixTrie& rtree) {
 }
 //// end Utils
 
-bool trivial_test_radix_trie() {
+bool trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		std::wostringstream sout, sout2;
 		RadixTrie rtree;
@@ -61,7 +61,7 @@ bool trivial_test_radix_trie() {
 	});
 }
 
-bool utf8_test_radix_trie() {
+bool utf8_test() {
 /*
 Данил - Дан
 Денис - Де
@@ -90,7 +90,7 @@ const wstring testsResExt = L".txt";
 const wstring testsResSimpleTreeFile = L"../tests/simple-tree.txt";
 const wstring testsResNamesShortFile = L"../tests/names-short.txt";
 
-bool all_steps_test_radix_trie() {
+bool all_steps_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		//// Init data
 		//std::vector<wstring> names;
@@ -139,12 +139,12 @@ bool _share_test_print_methods(RadixTrie& rtree, const wstring& resFile, std::fu
 	bool finalRes = true;
 	if (res != waitRes) {
 		finalRes = false;
-		outFactAndWaitResults(L"simple_tree_test_radix_trie", res, waitRes);
+		outFactAndWaitResults(L"simple_tree_test", res, waitRes);
 	}
 	return finalRes;
 }
 
-bool simple_tree_test_radix_trie() {
+bool simple_tree_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		RadixTrie rtree;
 		rtree.isOutSpecForDeps = false;
@@ -155,7 +155,7 @@ bool simple_tree_test_radix_trie() {
 	});
 }
 
-bool name_short_lines_test_radix_trie() {
+bool name_short_lines_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		RadixTrie rtree;
 		return _share_test_print_methods(rtree, testsResNamesShortFile, [](RadixTrie& rtree, std::wostringstream& sout) {
@@ -182,11 +182,11 @@ INIT(init_base_fixtures)
 
 BOOST_AUTO_TEST_CASE(test_of_nickname)
 {
-	BOOST_CHECK(trivial_test_radix_trie());
-	BOOST_CHECK(utf8_test_radix_trie());
-	BOOST_CHECK(simple_tree_test_radix_trie());
-	BOOST_CHECK(name_short_lines_test_radix_trie());
-	/*BOOST_CHECK(all_steps_test_radix_trie());*/
+	BOOST_CHECK(trivial_test());
+	BOOST_CHECK(utf8_test());
+	BOOST_CHECK(simple_tree_test());
+	BOOST_CHECK(name_short_lines_test());
+	BOOST_CHECK(all_steps_test());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
