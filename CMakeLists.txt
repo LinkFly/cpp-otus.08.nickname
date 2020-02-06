@@ -11,13 +11,16 @@ set(HEADERS
 	nickname.h
 	codepage-manager.h
 	)
+set(TESTS_HEADERS
+	tests-utils.h
+	)
 set(DATA_FILES
 
 
 	)
 
 add_executable(nickname ${SOURCES} ${HEADERS} ${DATA_FILES})
-add_executable(tests tests.cpp ${HEADERS})
+add_executable(tests tests.cpp ${TESTS_HEADERS} ${HEADERS})
 set_target_properties(nickname tests PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED ON

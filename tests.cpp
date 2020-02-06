@@ -15,6 +15,7 @@
 #include <cstdlib>
 
 #include "nickname.h"
+#include "tests-utils.h"
 
 using std::wstring;
 using std::string;
@@ -22,7 +23,7 @@ using std::cout;
 using std::endl;
 using std::clock;
 
-
+// Utils
 bool call_test(string name, std::function<bool(void)> fntest) {
 	cout << "------------------------------\n";
 	cout << endl << name << ":\n";
@@ -35,6 +36,14 @@ bool call_test(string name, std::function<bool(void)> fntest) {
 	cout << "------------------------------\n";
 	return res;
 }
+
+void addTestNames(RadixTrie& rtree) {
+	auto names = readTestNames();
+	for (auto name : names) {
+		rtree.append(name);
+	}
+}
+//// end Utils
 
 bool trivial_test_radix_trie() {
 	return call_test(__PRETTY_FUNCTION__, []() {
@@ -75,64 +84,18 @@ bool utf8_test_radix_trie() {
 		});
 }
 
-//// Utils
-//wstring read_file(wstring filename) {
-//	std::wifstream fin(filename, std::ios::in);
-//	wstring res;
-//	for (wstring line; std::getline(fin, line);)
-//		res += (line + L"\n");
-//	return res;
-//}
-
-wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff/*UTF16-BE*/) {
-	std::ifstream fin(filename, std::ios::in);
-	char buf[2];
-	auto toWChar = [](char* buf2ch) -> wchar_t {
-		return ((unsigned short)buf2ch[0] << 8) + (unsigned char)buf2ch[1];
-	};
-	wstring res = L"";
-	if (checkCodepage != L'0') {
-		fin.read(buf, 2);
-		wchar_t wch = toWChar(buf);
-		if (wch != checkCodepage) {
-			string sFile = string{ filename.begin(), filename.end() };
-			std::cerr << "Bad codepage in file: " << sFile << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
-			exit(-1);
-		}
-	}
-	while (true) {
-		fin.read(buf, 2);
-		if (!fin) {
-			break;
-		}
-		res += toWChar(buf);
-	}
-	return res;
-}
-
-template <class Container>
-void split(const std::wstring& str, Container& cont, wchar_t delim = ' ')
-{
-	std::wstringstream ss(str);
-	std::wstring token;
-	while (std::getline(ss, token, delim)) {
-		cont.push_back(token);
-	}
-}
-//// end Utils
-
 // TODO To config
-const wstring testsNamesFile = L"../tests/names.txt";
 const wstring testsResDir = L"../tests/results/";
 const wstring testsResExt = L".txt";
+const wstring testsResSimpleTreeFile = L"../tests/simple-tree.txt";
+const wstring testsResNamesShortFile = L"../tests/names-short.txt";
 
 bool all_steps_test_radix_trie() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		//// Init data
-		std::vector<wstring> names;
+		//std::vector<wstring> names;
 		std::map<wstring, wstring> stepMapArgRes;
-		wstring allNames = w_read_file_utf8_be_bom(testsNamesFile);
-		split(allNames, names, L'\n');
+		auto names = readTestNames();
 		auto pathPrefix = testsResDir;
 		auto ext = testsResExt;
 		for (auto name : names) {
@@ -159,18 +122,46 @@ bool all_steps_test_radix_trie() {
 			const auto waitRes = stepMapArgRes[name];
 			if (res != waitRes) {
 				finalRes = false;
-				const string sName(name.begin(), name.end());
-				const string sRes(res.begin(), res.end());
-				const string sWaitRes(waitRes.begin(), waitRes.end());
-				cout << "\nFailed checking: " << sName << "\n"
-					<< "Fact Res: " << sRes << "\n"
-					<< "Wait res: " << sWaitRes << "\n"
-					<< endl;
+				outFactAndWaitResults(name, res, waitRes);
 				break;
 			}
 		}
 		return finalRes;
 		});
+}
+
+bool _share_test_print_methods(RadixTrie& rtree, const wstring& resFile, std::function<void(RadixTrie&, std::wostringstream&)> fnTreeOps) {
+	addTestNames(rtree);
+	std::wostringstream sout;
+	fnTreeOps(rtree, sout);
+	auto res = sout.str();
+	wstring waitRes = w_read_file_utf8_be_bom(resFile);
+	bool finalRes = true;
+	if (res != waitRes) {
+		finalRes = false;
+		outFactAndWaitResults(L"simple_tree_test_radix_trie", res, waitRes);
+	}
+	return finalRes;
+}
+
+bool simple_tree_test_radix_trie() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		RadixTrie rtree;
+		rtree.isOutSpecForDeps = false;
+		rtree.sGap = L"  ";
+		return _share_test_print_methods(rtree, testsResSimpleTreeFile, [](RadixTrie& rtree, std::wostringstream& sout) {
+			rtree.printTree(sout);
+		});
+	});
+}
+
+bool name_short_lines_test_radix_trie() {
+	return call_test(__PRETTY_FUNCTION__, []() {
+		RadixTrie rtree;
+		return _share_test_print_methods(rtree, testsResNamesShortFile, [](RadixTrie& rtree, std::wostringstream& sout) {
+			rtree.print(sout);
+			});
+	});
 }
 
 void init_base_fixtures() {
@@ -186,7 +177,6 @@ struct Init {
 };
 #define INIT(init_func) struct Init init(init_func);
 
-
 BOOST_AUTO_TEST_SUITE(allocator_test_suite)
 INIT(init_base_fixtures)
 
@@ -194,8 +184,9 @@ BOOST_AUTO_TEST_CASE(test_of_nickname)
 {
 	BOOST_CHECK(trivial_test_radix_trie());
 	BOOST_CHECK(utf8_test_radix_trie());
-	BOOST_CHECK(all_steps_test_radix_trie());
-	
+	BOOST_CHECK(simple_tree_test_radix_trie());
+	BOOST_CHECK(name_short_lines_test_radix_trie());
+	/*BOOST_CHECK(all_steps_test_radix_trie());*/
 }
 
 BOOST_AUTO_TEST_SUITE_END()

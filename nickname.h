@@ -179,12 +179,27 @@ class RadixTrie {
 		out << (isCorrectGap ? sGap.substr(1) : sGap);
 	}
 
+	//bool isEndLabel(std::unique_ptr<Node>& node) {
+	//	wstring& label = node->label;
+	//	auto isEnd = false;
+	//	if (node->isNoChildren()) {
+	//		isEnd = true;
+	//	}
+	//	else {
+	//		if (label.size() > 0) {
+	//			isEnd = label[label.size() - 1] == L'$';
+	//		}
+	//	}
+	//	return isEnd;
+	//}
+
 	void _print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"") {
 		if (path == L"") {
 			path = node->label;
 		}
 		wstring curLabel = label + node->label;
-		if (node->isNoChildren()) {
+		
+		if (node->isEnd) {
 			if (!isUpFstCharOnPrint) {
 				out << curLabel << " " << path << endl;
 			}

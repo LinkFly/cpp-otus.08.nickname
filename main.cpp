@@ -28,19 +28,26 @@ int main() {
 	inOutInit.init();
 	
 	RadixTrie rtree;
-	rtree.isOutQuotes = true;
-	rtree.isOutSpecForDeps = true;
+	rtree.isOutQuotes = false;
+	rtree.isOutSpecForDeps = false;
 	rtree.sGap = L"  ";
+
 	// TODO!!!!! Добавить обработку файла данных и потока ввода 
-	rtree.append(L"mark");
-	rtree.append(L"mast");
-	rtree.append(L"Марк");
-	/*rtree.append(L"Марк");
-	rtree.append(L"Mark");
-	rtree.append(L"Марк");
-	rtree.append(L"Маст");*/
+	std::vector names = {
+		L"aleksey",
+		L"sasha",
+		L"aleks",
+		L"alek",
+		L"alesha",
+		L"maksim"
+	};
+
+	for (auto name : names) {
+		rtree.append(name);
+	}
 
 	rtree.print();
+	wcout << endl;
 	rtree.printTree();
 
 	return 0;
