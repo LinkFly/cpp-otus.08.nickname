@@ -23,15 +23,14 @@ using std::string;
 //	}
 //};
 
-int main() {
+int main() {;
 	//InOutInit inOutInit;
 	//inOutInit.init();
-	cout << "cout: " << "ПриветПривет" << endl;
 	RadixTrie rtree;
 	rtree.isOutQuotes = false;
 	rtree.isOutSpecForDeps = false;
 	//rtree.isUpFstCharOnPrint = true;
-	rtree.sGap = L"  ";
+	rtree.sGap = "  ";
 
 	// TODO!!!!! Добавить обработку файла данных и потока ввода 
 	std::vector names = {
@@ -41,10 +40,11 @@ int main() {
 		L"alek",
 		L"alesha",
 		L"maksim",
-		L"Маша",
-		L"АЛЕША",
-		L"Алексей",
-		L"Ыва"
+		//L"Мxz",
+		//L"Маша",
+		//L"АЛЕША",
+		//L"Алексей",
+		//L"Ыва"
 	};
 
 	for (auto name : names) {

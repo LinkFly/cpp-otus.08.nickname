@@ -5,25 +5,27 @@
 #include <array>
 //#include <type_traits>
 
-using std::wstring;
+using std::string;
 
 // constexpr uint8_t size = 26 + 33;  // eng + rus
-constexpr uint16_t size = (256 * 256) - 1; // any byte (any codepage)
+constexpr uint8_t size = 255; // any byte (any codepage)
+//constexpr uint16_t size = 65535; // any byte (any codepage)
 
 struct Node {
+	using IdxChar = char;
 	using children_size_t = decltype(size);
-	wstring label;
+	string label;
 	bool isEnd{};
 	std::array<std::unique_ptr<Node>, size> children;
 	// TODO!! Пересмотреть использовать bitset'a
 	std::bitset<size> busySet = 0;
 
-	std::unique_ptr<Node>& getNode(wchar_t ch = 0) {
+	std::unique_ptr<Node>& getNode(IdxChar ch = 0) {
 		//if (ch == 0) {
 		//	return std::make_unique<Node>();
 		//}
 
-		//checkChar(ch);
+		checkChar(ch);
 
 		// TODO!!!!! Возможно Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
 		auto idx = getIdx(ch);
@@ -48,7 +50,7 @@ struct Node {
 		}
 	}
 
-	void setNode(wchar_t ch, std::unique_ptr<Node>& node) {
+	void setNode(IdxChar ch, std::unique_ptr<Node>& node) {
 		auto idx = getIdx(ch);
 		if (node.get() != nullptr) {
 			busySet.set(idx);
@@ -61,7 +63,7 @@ struct Node {
 		return busySet.count() == 0;
 	}
 
-	static children_size_t getIdx(wchar_t wch) {
+	static children_size_t getIdx(IdxChar wch) {
 		return wch;
 		//int8_t res;
 		//if (isIn(wch, L'a', L'z')) {
@@ -78,7 +80,7 @@ struct Node {
 		//}
 		//return res;
 	}
-	static wchar_t getChar(children_size_t idx) {
+	static IdxChar getChar(children_size_t idx) {
 		return idx;
 		//if (idx < 26) {
 		//	return L'a' + idx;
@@ -93,21 +95,22 @@ struct Node {
 	}
 
 private:
-	static bool isIn(wchar_t ch, wchar_t low, wchar_t high) {
+	static bool isIn(IdxChar ch, wchar_t low, wchar_t high) {
 		return ch >= low && ch <= high;
 	}
 
-	static void checkChar(wchar_t ch) {
+	static void checkChar(IdxChar ch) {
 		// TODO! Correct error handling
-		if (!(
-			isIn(ch, L'a', L'z')
-			//(ch >= L'a' && ch <= L'z') 
-			||
-			isIn(ch, L'а'/*rus*/, L'я')
-			//(ch >= L'а'/*rus*/ && ch <= L'я')
-			||
-			ch == L'ё'
-			)) {
+		//if (!(
+		//	isIn(ch, L'a', L'z')
+		//	//(ch >= L'a' && ch <= L'z') 
+		//	||
+		//	isIn(ch, L'а'/*rus*/, L'я')
+		//	//(ch >= L'а'/*rus*/ && ch <= L'я')
+		//	||
+		//	ch == L'ё'
+		//	)) {
+		if (ch == 0) {
 			std::cerr << "Bad char\n";
 			exit(1);
 		}

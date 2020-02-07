@@ -6,6 +6,16 @@
 #include <algorithm>
 #include <functional>
 #include <cwctype>
+#include <sstream>
+#include <stdio.h>
+
+// TODO!!!!! Share code with tests-utils.h
+//#include <codecvt>
+//std::string wstring_to_utf8(const std::wstring& str)
+//{
+//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+//	return myconv.to_bytes(str);
+//}
 
 #include "node.h"
 
@@ -15,15 +25,15 @@ using std::endl;
 using std::string;
 using std::wstring;
 
-wstring upFirstChar(wstring str) {
-	wchar_t upCh = std::towupper(str[0]);
-	return wstring{upCh} + str.substr(1);
-}
-
-wstring tolower(wstring label) {
-	std::transform(label.begin(), label.end(), label.begin(), std::towlower);
-	return label;
-}
+//mstring upFirstChar(mstring str) {
+//	char upCh = std::towupper(str[0]);
+//	return mstring{upCh} + str.substr(1);
+//}
+//
+//mstring tolower(mstring label) {
+//	std::transform(label.begin(), label.end(), label.begin(), std::towlower);
+//	return label;
+//}
 
 const wchar_t GAP_END = L'└';
 const wchar_t GAP_HERE = L'├';
@@ -31,11 +41,21 @@ const wchar_t GAP_NEXT = L'│';
 
 class RadixTrie {
 	std::unique_ptr<Node> root;
+	const string gapEnd = RadixTrie::prepGap(GAP_END);
+	const string gapHere = prepGap(GAP_HERE);
+	const string gapNext = prepGap(GAP_NEXT);
+
+	static string prepGap(wchar_t gap) {
+		return wstring_to_utf8(wstring{ gap });
+	}
 
 	static void append(std::unique_ptr<Node>& node, const wstring& initLabel) {
+		append(node, wstring_to_utf8(initLabel));
+	}
+	static void append(std::unique_ptr<Node>& node, const string& initLabel) {
 		// prepare label
 		//wstring label = tolower(initLabel);
-		const wstring& label = initLabel;
+		const string& label = initLabel;
 		if (node.get() == nullptr) {
 			auto newNode = std::make_unique<Node>();
 			node.swap(newNode);
@@ -46,7 +66,7 @@ class RadixTrie {
 
 		bool isNoChildren = node->isNoChildren();
 
-		if (node->label == L"") {
+		if (node->label == "") {
 			if (isNoChildren) {
 				node->label = label;
 				node->isEnd = true;
@@ -71,16 +91,16 @@ class RadixTrie {
 		auto pos1 = st1 - label.begin();
 		auto pos2 = st2 - node->label.begin();
 		// share part
-		wstring share = label.substr(0, pos1);
+		string share = label.substr(0, pos1);
 
 		// not equal parts
-		wstring restLabel = label.substr(pos1);
-		wstring restNode = node->label.substr(pos2);
+		string restLabel = label.substr(pos1);
+		string restNode = node->label.substr(pos2);
 
-		bool isShare = share != L"";
-		bool isLabelInNode = node->label != L"";
-		bool isRestInLabel = restLabel != L"";
-		bool isRestInNode = restNode != L"";
+		bool isShare = share != "";
+		bool isLabelInNode = node->label != "";
+		bool isRestInLabel = restLabel != "";
+		bool isRestInNode = restNode != "";
 		if (!isLabelInNode) {
 			if (isNoChildren) {
 				node->label = label;
@@ -128,13 +148,46 @@ class RadixTrie {
 		}
 	}
 
-	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, bool topLevel = true, bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
+	string _prepareLabel(string& label, bool &isErr) {
+		isErr = false;
+		string res = "";
+		bool bSoutIsInit = false;
+		std::unique_ptr<std::ostringstream> sout;
+		auto maybe_init_sout = [&bSoutIsInit , &sout]() {
+			if (!bSoutIsInit) {
+				sout = std::make_unique<std::ostringstream>();
+				bSoutIsInit = true;
+			}
+		};
+		for (uint8_t ch : label) {
+			if (ch <= 127) {
+				res += ch;
+			}
+			else {
+				isErr = true;
+				return "";
+				//maybe_init_sout();
+				//(*sout) << "\\x" << std::hex << static_cast<int>(ch);
+				//string s = sout->str();
+				//res += sout->str();
+			}
+		}
+		return res;
+	}
+
+	void _printTree(std::ostream& out, std::unique_ptr<Node>& node, bool topLevel = true, bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
 		if (!topLevel) {
 			printGap(out, isLast, parentLines);
 			parentLines.push_back(!isLast);
 		}
-		wstring endMark = node->isEnd ? L"$" : L"";
-		out << (isOutQuotes ? L"\"" : L"") << node->label << (isOutQuotes ? L"\"" : L"") << endMark << L'\n';
+		bool isErr;
+		string preparedLabel = _prepareLabel(node->label, isErr);
+		if (isErr) {
+			std::cerr << "------- ERROR _printTree: Not implemented for symbols with code > 127 ------- \n";
+			exit(-1);
+		}
+		string endMark = node->isEnd ? "$" : "";
+		out << (isOutQuotes ? "\"" : "") << preparedLabel << (isOutQuotes ? "\"" : "") << endMark << '\n';
 		node->forEach([this, &out, &parentLines](
 			std::unique_ptr<Node>& node, [[maybe_unused]] Node::children_size_t idx, bool isLast) {
 			_printTree(out, node, false, isLast, parentLines);
@@ -143,40 +196,42 @@ class RadixTrie {
 			parentLines.pop_back();
 		}
 	}
+
 	// For _printTree
-	void printGap(std::wostream& out, bool isLast, std::vector<bool> parentLines) {
+	void printGap(std::ostream& out, bool isLast, std::vector<bool> parentLines) {
 		bool isCorrectGap = isOutSpecForDeps && isWriteSpecToBeginGap;
 		for (bool isNext : parentLines) {
 			if (isOutSpecForDeps) {
 				if (isNext) {
-					out << GAP_NEXT;
+					out << gapNext;
 				}
 			}
 			out << (isCorrectGap && isNext ? sGap.substr(1) : sGap);
 		}
 		if (isOutSpecForDeps) {
-			out << (isLast ? GAP_END : GAP_HERE);
+			out << (isLast ? gapEnd : gapHere);
 		}
 		out << (isCorrectGap ? sGap.substr(1) : sGap);
 	}
 
-	void _print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"") {
-		if (path == L"") {
+	void _print(std::ostream& out, std::unique_ptr<Node>& node, string label = "", string path = "") {
+		if (path == "") {
 			path = node->label;
 		}
-		wstring curLabel = label + node->label;
+		string curLabel = label + node->label;
 		
 		if (node->isEnd) {
-			if (!isUpFstCharOnPrint) {
+			out << curLabel << " " << path << endl;
+			/*if (!isUpFstCharOnPrint) {
 				out << curLabel << " " << path << endl;
 			}
 			else {
 				out << upFirstChar(curLabel) << " " << upFirstChar(path) << endl;
-			}
+			}*/
 		}
 		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, Node::children_size_t idx, [[maybe_unused]] bool isLast) {
-			wchar_t ch = Node::getChar(idx);
-			wstring curPath = curLabel + wstring{ ch };
+			char ch = Node::getChar(idx);
+			string curPath = curLabel + string{ ch };
 			_print(out, node, curLabel, curPath);
 			});
 	}
@@ -185,17 +240,17 @@ public:
 	// Config (set it after create instance)
 	bool isOutQuotes = false;
 	bool isOutSpecForDeps = false;
-	bool isUpFstCharOnPrint = false;
-	wstring sGap = L"\t";
+	/*bool isUpFstCharOnPrint = false;*/
+	string sGap = "\t";
 	bool isWriteSpecToBeginGap = true;
 
 	void append(const wstring& label) {
 		append(root, label);
 	}
-	void printTree(std::wostream& out = wcout) {
+	void printTree(std::ostream& out = cout) {
 		_printTree(out, root);
 	}
-	void print(std::wostream& out = wcout) {
-		_print(out, root, L"", L"");
+	void print(std::ostream& out = cout) {
+		_print(out, root, "", "");
 	}
 };

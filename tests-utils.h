@@ -22,11 +22,11 @@ const wstring testsNamesFile = L"../tests/names.txt";
 //}
 
 // convert wstring to UTF-8 string
-std::string wstring_to_utf8(const std::wstring& str)
-{
-	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-	return myconv.to_bytes(str);
-}
+//std::string wstring_to_utf8(const std::wstring& str)
+//{
+//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+//	return myconv.to_bytes(str);
+//}
 
 const wchar_t defaultCheckCodepage = 0xfeff/*UTF16-BE*/;
 
@@ -78,12 +78,15 @@ std::vector<wstring> readTestNames() {
 	return names;
 }
 
-void outFactAndWaitResults(const wstring& name, const wstring& res, const wstring& waitRes) {
-	const string sName = wstring_to_utf8(name);// (name.begin(), name.end());
-	const string sRes = wstring_to_utf8(res);// (res.begin(), res.end());
-	const string sWaitRes = wstring_to_utf8(waitRes);// (waitRes.begin(), waitRes.end());
-	cout << "\nFailed checking: " << sName << "\n"
-		<< "Fact Res:\n---------\n" << sRes << "\n--------\n"
-		<< "Wait res:\n---------\n" << sWaitRes << "\n--------\n"
+void outFactAndWaitResults(const string& name, const string& res, const string& waitRes) {
+	cout << "\nFailed checking: " << name << "\n"
+		<< "Fact Res:\n---------\n" << res << "\n--------\n"
+		<< "Wait res:\n---------\n" << waitRes << "\n--------\n"
 		<< endl;
+}
+void outFactAndWaitResults(const wstring& name, const wstring& res, const wstring& waitRes) {
+	const string sName = wstring_to_utf8(name);
+	const string sRes = wstring_to_utf8(res);
+	const string sWaitRes = wstring_to_utf8(waitRes);
+	outFactAndWaitResults(sName, sRes, sWaitRes);
 } 
