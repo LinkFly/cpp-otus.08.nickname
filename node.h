@@ -35,7 +35,7 @@ struct Node {
 	void forEach(std::function<void(std::unique_ptr<Node>&, int idx, bool isLast)> fn) {
 		auto count = busySet.count();
 		decltype(count) order = 0;
-		for (int i = 0; i < busySet.size(); ++i) {
+		for (size_t i = 0; i < busySet.size(); ++i) {
 			if (busySet[i]) {
 				order++;
 				fn(children[i], i, order == count);
@@ -55,7 +55,7 @@ struct Node {
 		return busySet.to_ullong() == (unsigned long)0;
 	}
 
-	static const int8_t getIdx(wchar_t wch) {
+	static int8_t getIdx(wchar_t wch) {
 		int8_t res;
 		if (isIn(wch, L'a', L'z')) {
 			res = wch - 'a';

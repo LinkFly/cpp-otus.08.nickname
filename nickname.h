@@ -142,27 +142,23 @@ class RadixTrie {
 		}
 	}
 
-	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, bool topLevel = true, /*int level = 0, */bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
-		//const bool isNoChildren = node->isNoChildren();
-		/*if (node->label != L"") {*/
+	void _printTree(std::wostream& out, std::unique_ptr<Node>& node, bool topLevel = true, bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
 		if (!topLevel) {
-			printGap(out, topLevel, isLast, parentLines);
+			printGap(out, isLast, parentLines);
 			parentLines.push_back(!isLast);
 		}
 		wstring endMark = node->isEnd ? L"$" : L"";
 		out << (isOutQuotes ? L"\"" : L"") << node->label << (isOutQuotes ? L"\"" : L"") << endMark << L'\n';
-		/*node->forEach([this, &level, &out, &parentLines](*/
 		node->forEach([this, &out, &parentLines](
 			std::unique_ptr<Node>& node, [[maybe_unused]] int idx, bool isLast) {
-			_printTree(out, node, false, /*level + 1, */isLast, parentLines);
+			_printTree(out, node, false, isLast, parentLines);
 			});
-		/*if (node->label != L"") {*/
 		if (!topLevel) {
 			parentLines.pop_back();
 		}
 	}
 	// For _printTree
-	void printGap(std::wostream& out, bool topLevel, /*int gapCount, */bool isLast, std::vector<bool> parentLines) {
+	void printGap(std::wostream& out, bool isLast, std::vector<bool> parentLines) {
 		bool isCorrectGap = isOutSpecForDeps && isWriteSpecToBeginGap;
 		for (bool isNext : parentLines) {
 			if (isOutSpecForDeps) {
@@ -178,20 +174,6 @@ class RadixTrie {
 		out << (isCorrectGap ? sGap.substr(1) : sGap);
 	}
 
-	//bool isEndLabel(std::unique_ptr<Node>& node) {
-	//	wstring& label = node->label;
-	//	auto isEnd = false;
-	//	if (node->isNoChildren()) {
-	//		isEnd = true;
-	//	}
-	//	else {
-	//		if (label.size() > 0) {
-	//			isEnd = label[label.size() - 1] == L'$';
-	//		}
-	//	}
-	//	return isEnd;
-	//}
-
 	void _print(std::wostream& out, std::unique_ptr<Node>& node, wstring label = L"", wstring path = L"") {
 		if (path == L"") {
 			path = node->label;
@@ -206,7 +188,7 @@ class RadixTrie {
 				out << upFirstChar(curLabel) << " " << upFirstChar(path) << endl;
 			}
 		}
-		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, int idx, bool isLast) {
+		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, int idx, [[maybe_unused]] bool isLast) {
 			wchar_t ch = Node::getChar(idx);
 			wstring curPath = curLabel + wstring{ ch };
 			_print(out, node, curLabel, curPath);
