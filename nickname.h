@@ -16,8 +16,23 @@ using std::endl;
 using std::string;
 using std::wstring;
 
+// TODO! Share with tolower (maybe sharing code up/low char)
+static wchar_t toWCharUp(wchar_t ch) {
+	if (ch >= L'a' && ch <= L'z') {
+		return L'A' + (ch - L'a');
+	}
+	else if (ch >= L'а'/*rus*/ && ch <= L'я') {
+		return L'А'/*rus*/ + (ch - L'а'/*rus*/);
+	}
+	else if (ch == L'ё') {
+		return L'Ё';
+	}
+	else return ch;
+}
+
 wstring upFirstChar(wstring str) {
-	return wstring{ std::towupper(str[0]) } +str.substr(1);
+	wchar_t upCh = toWCharUp(str[0]);
+	return wstring{upCh} + str.substr(1);
 }
 
 const wchar_t GAP_END = L'└';
@@ -212,5 +227,4 @@ public:
 	void print(std::wostream& out = wcout) {
 		_print(out, root, L"", L"");
 	}
-	
 };
