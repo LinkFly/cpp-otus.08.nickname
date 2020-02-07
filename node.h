@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 
 #include <string>
 #include <bitset>
@@ -12,7 +12,7 @@ struct Node {
 	wstring label;
 	bool isEnd{};
 	std::array<std::unique_ptr<Node>, size> children;
-	// TODO!! Пересмотреть использовать bitset'a
+	// TODO!! РџРµСЂРµСЃРјРѕС‚СЂРµС‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ bitset'a
 	std::bitset<size> busySet = 0;
 
 	std::unique_ptr<Node>& getNode(wchar_t ch = 0) {
@@ -20,7 +20,7 @@ struct Node {
 		//	return std::make_unique<Node>();
 		//}
 		checkChar(ch);
-		// TODO!!! Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
+		// TODO!!! РЈРїСЂР°Р·РґРЅРёС‚СЊ bitset - СЃС‡РёС‚Р°С‚СЊ Р·Р°РЅСЏС‚РѕСЃС‚СЊ/РЅРµ Р·Р°РЅСЏС‚РѕСЃС‚СЊ РїРѕ РЅР°Р»РёС‡РёСЋ null/not null, РІ СЃРѕРѕС‚РІ. СЏС‡РµР№РєРµ
 		auto idx = getIdx(ch);
 		if (busySet[idx]) {
 			return children[idx];
@@ -60,10 +60,10 @@ struct Node {
 		if (isIn(wch, L'a', L'z')) {
 			res = wch - 'a';
 		}
-		else if (isIn(wch, L'а'/*rus*/, L'я')) {
-			res = wch - L'а'/*rus*/ + 26;
+		else if (isIn(wch, L'Р°'/*rus*/, L'СЏ')) {
+			res = wch - L'Р°'/*rus*/ + 26;
 		}
-		else if (wch == L'ё') {
+		else if (wch == L'С‘') {
 			res = 26 + 33;
 		}
 		else {
@@ -76,10 +76,10 @@ struct Node {
 			return L'a' + idx;
 		}
 		else if (idx >= 26 && idx < 26 + 32) {
-			return L'а'/*rus*/ + (idx - 26);
+			return L'Р°'/*rus*/ + (idx - 26);
 		}
 		else if (idx == 26 + 33) {
-			return L'ё';
+			return L'С‘';
 		}
 		else return L'\0';
 	}
@@ -95,10 +95,10 @@ private:
 			isIn(ch, L'a', L'z')
 			//(ch >= L'a' && ch <= L'z') 
 			||
-			isIn(ch, L'а'/*rus*/, L'я')
-			//(ch >= L'а'/*rus*/ && ch <= L'я')
+			isIn(ch, L'Р°'/*rus*/, L'СЏ')
+			//(ch >= L'Р°'/*rus*/ && ch <= L'СЏ')
 			||
-			ch == L'ё'
+			ch == L'С‘'
 			)) {
 			std::cerr << "Bad char\n";
 			exit(1);

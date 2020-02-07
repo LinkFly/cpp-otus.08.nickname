@@ -95,8 +95,6 @@ class RadixTrie {
 		bool isLabelInNode = node->label != L"";
 		bool isRestInLabel = restLabel != L"";
 		bool isRestInNode = restNode != L"";
-		bool isEndInNode = node->isEnd;
-
 		if (!isLabelInNode) {
 			if (isNoChildren) {
 				node->label = label;
@@ -154,7 +152,7 @@ class RadixTrie {
 		wstring endMark = node->isEnd ? L"$" : L"";
 		out << (isOutQuotes ? L"\"" : L"") << node->label << (isOutQuotes ? L"\"" : L"") << endMark << L'\n';
 		/*node->forEach([this, &level, &out, &parentLines](*/
-		node->forEach([this, &topLevel, &out, &parentLines](
+		node->forEach([this, &out, &parentLines](
 			std::unique_ptr<Node>& node, [[maybe_unused]] int idx, bool isLast) {
 			_printTree(out, node, false, /*level + 1, */isLast, parentLines);
 			});
@@ -208,7 +206,7 @@ class RadixTrie {
 				out << upFirstChar(curLabel) << " " << upFirstChar(path) << endl;
 			}
 		}
-		node->forEach([this, &path, &curLabel, &out](std::unique_ptr<Node>& node, int idx, bool isLast) {
+		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, int idx, bool isLast) {
 			wchar_t ch = Node::getChar(idx);
 			wstring curPath = curLabel + wstring{ ch };
 			_print(out, node, curLabel, curPath);
