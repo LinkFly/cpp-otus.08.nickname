@@ -8,7 +8,6 @@
 using std::string;
 
 void setCodePage(const char codepage[]) {
-	FILE* pfRes;
 	auto nullDev = "null"; // for future extensions: for unix must be /dev/null
 	auto setCodePageCmd = ("chcp " + string{ codepage } +" > " + nullDev);
 	system(setCodePageCmd.c_str());

@@ -14,7 +14,10 @@ using std::endl;
 using std::string;
 
 struct InOutInit {
-	std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
+	using converter_t = std::codecvt_utf8<wchar_t>;
+	std::unique_ptr< converter_t > converter = std::make_unique< converter_t >();
+	std::locale utf8_locale = std::locale(std::locale{}, converter.get());
+	/*std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});*/
 	void init(std::wostream& out = std::wcout) {
 		out.imbue(utf8_locale);
 	}

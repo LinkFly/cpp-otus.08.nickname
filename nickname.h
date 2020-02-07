@@ -51,7 +51,8 @@ class RadixTrie {
 		wstring label = tolower(initLabel);
 
 		if (node.get() == nullptr) {
-			node.reset(new Node());
+			auto newNode = std::make_unique<Node>();
+			node.swap(newNode);
 			node->label = label;
 			node->isEnd = true;
 			return;
