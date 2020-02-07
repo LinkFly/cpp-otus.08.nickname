@@ -11,12 +11,6 @@
 #define AUTO_CHANGE_CODEPAGE_FOR_WIN 1
 //// end Configs
 
-#ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
+#if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
 #include "codepage-manager.h"
 #endif
-
-//#include <string>
-//#include <codecvt>
-
-
-

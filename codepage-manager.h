@@ -37,7 +37,6 @@ string getStartedCodePage() {
 	return res;
 }
 
-#ifdef WIN32
 void systemSpecificInOutInit() {
 #ifdef _MSC_VER
 	static auto codepageStarted = getStartedCodePage();
@@ -49,4 +48,3 @@ void systemSpecificInOutInit() {
 #error "Auto changing codepage allow only VS compilers"
 #endif
 }
-#endif
