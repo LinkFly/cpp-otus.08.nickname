@@ -14,3 +14,25 @@
 #if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
 #include "codepage-manager.h"
 #endif
+
+#include <locale>
+#include <codecvt>
+#include <iostream>
+
+/////////// Init code ////////////
+// For to run init code
+namespace _unused {
+	struct init_t {
+		int f = 0;
+		init_t() {
+			setlocale(LC_ALL, "Russian_Russia.UTF8");
+#if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
+			systemSpecificInOutInit();
+#endif
+			//std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
+			//std::wcout.imbue(utf8_locale);
+		}
+	} init;
+}
+
+

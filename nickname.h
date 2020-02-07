@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <functional>
 #include <cwctype>
-//#include <stack>
 
 #include "node.h"
 
@@ -16,23 +15,14 @@ using std::endl;
 using std::string;
 using std::wstring;
 
-// TODO! Share with tolower (maybe sharing code up/low char)
-static wchar_t toWCharUp(wchar_t ch) {
-	if (ch >= L'a' && ch <= L'z') {
-		return L'A' + (ch - L'a');
-	}
-	else if (ch >= L'а'/*rus*/ && ch <= L'я') {
-		return L'А'/*rus*/ + (ch - L'а'/*rus*/);
-	}
-	else if (ch == L'ё') {
-		return L'Ё';
-	}
-	else return ch;
+wstring upFirstChar(wstring str) {
+	wchar_t upCh = std::towupper(str[0]);
+	return wstring{upCh} + str.substr(1);
 }
 
-wstring upFirstChar(wstring str) {
-	wchar_t upCh = toWCharUp(str[0]);
-	return wstring{upCh} + str.substr(1);
+wstring tolower(wstring label) {
+	std::transform(label.begin(), label.end(), label.begin(), std::towlower);
+	return label;
 }
 
 const wchar_t GAP_END = L'└';
@@ -41,25 +31,6 @@ const wchar_t GAP_NEXT = L'│';
 
 class RadixTrie {
 	std::unique_ptr<Node> root;
-	
-	// TODO! Поискать стандартную ф-ию перевода широких строк к нижнему регистру (также поискать в boost'e)
-	static wstring tolower(wstring label) {
-		std::transform(label.begin(), label.end(), label.begin(), [](wchar_t ch) -> wchar_t {
-			if (ch >= L'A' && ch <= L'Z') {
-				return L'a' + (ch - L'A');
-			}
-			else if (ch >= L'А'/*rus*/ && ch <= L'Я') {
-				return L'а'/*rus*/ + (ch - L'А'/*rus*/);
-			}
-			else if (ch == L'Ё') {
-				return L'ё';
-			}
-			else {
-				return ch;
-			}
-			});
-		return label;
-	}
 
 	static void append(std::unique_ptr<Node>& node, const wstring& initLabel) {
 		// prepare label

@@ -71,8 +71,8 @@ bool utf8_test() {
 		std::wostringstream sout, sout2;
 		RadixTrie rtree;
 		rtree.append(L"Данил");
-		rtree.append(L"Денис");
-		rtree.append(L"Даша");
+		rtree.append(L"денИС");
+		rtree.append(L"ДАША");
 
 		rtree.printTree(sout);
 		rtree.print(sout2);
@@ -165,9 +165,11 @@ bool name_short_lines_test() {
 }
 
 void init_base_fixtures() {
-#if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
-	systemSpecificInOutInit();
-#endif
+	//char s[] = u8"ПриветПривет";
+	//cout << "cout: " << s << endl;
+	//cout << "here\n";
+	//cout << wstring_to_utf8(L"ПриветПривет") << endl;
+	//wcout << L"wcout: " << L"ПриветПривет" << endl;
 }
 
 struct Init {

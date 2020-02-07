@@ -14,23 +14,23 @@ using std::cout;
 using std::endl;
 using std::string;
 
-struct InOutInit {
-	std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
-	void init(std::wostream& out = std::wcout) {
-		out.imbue(utf8_locale);
-	}
-};
+//std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
+//
+//struct InOutInit {
+//	
+//	void init(std::wostream& out = std::wcout) {
+//		out.imbue(utf8_locale);
+//	}
+//};
 
 int main() {
-#if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
-	systemSpecificInOutInit();
-#endif
-	InOutInit inOutInit;
-	inOutInit.init();
-	
+	//InOutInit inOutInit;
+	//inOutInit.init();
+	cout << "cout: " << "ПриветПривет" << endl;
 	RadixTrie rtree;
 	rtree.isOutQuotes = false;
 	rtree.isOutSpecForDeps = false;
+	//rtree.isUpFstCharOnPrint = true;
 	rtree.sGap = L"  ";
 
 	// TODO!!!!! Добавить обработку файла данных и потока ввода 
@@ -40,7 +40,11 @@ int main() {
 		L"aleks",
 		L"alek",
 		L"alesha",
-		L"maksim"
+		L"maksim",
+		L"Маша",
+		L"АЛЕША",
+		L"Алексей",
+		L"Ыва"
 	};
 
 	for (auto name : names) {
