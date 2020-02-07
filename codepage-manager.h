@@ -37,8 +37,8 @@ string getStartedCodePage() {
 	return res;
 }
 
-void systemSpecificInOutInit() {
 #ifdef WIN32
+void systemSpecificInOutInit() {
 #ifdef _MSC_VER
 	static auto codepageStarted = getStartedCodePage();
 	setUTF8CodePage();
@@ -48,7 +48,5 @@ void systemSpecificInOutInit() {
 #else
 #error "Auto changing codepage allow only VS compilers"
 #endif
-#else 
-#error "Auto changing codepage allow on WIN"
-#endif
 }
+#endif

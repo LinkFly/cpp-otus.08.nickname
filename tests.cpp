@@ -165,7 +165,7 @@ bool name_short_lines_test() {
 }
 
 void init_base_fixtures() {
-#ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
+#if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
 	systemSpecificInOutInit();
 #endif
 }
@@ -188,5 +188,4 @@ BOOST_AUTO_TEST_CASE(test_of_nickname)
 	BOOST_CHECK(name_short_lines_test());
 	BOOST_CHECK(all_steps_test());
 }
-
 BOOST_AUTO_TEST_SUITE_END()
