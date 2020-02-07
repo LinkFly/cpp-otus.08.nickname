@@ -71,16 +71,20 @@ bool utf8_test() {
 		std::wostringstream sout, sout2;
 		RadixTrie rtree;
 		rtree.append(L"Данил");
-		rtree.append(L"денИС");
-		rtree.append(L"ДАША");
+		rtree.append(L"Денис");
+		rtree.append(L"Даша");
 
 		rtree.printTree(sout);
 		rtree.print(sout2);
 		auto res1 = sout.str();
 		auto res2 = sout2.str();
-		wstring waitRes1 = L"д\n\tа\n\t\tнил$\n\t\tша$\n\tенис$\n";
-		wstring waitRes2 = L"данил дан\nдаша даш\nденис де\n";
-		return res1 == waitRes1 && res2 == waitRes2;
+		wstring waitRes1 = L"Д\n\tа\n\t\tнил$\n\t\tша$\n\tенис$\n";
+		wstring waitRes2 = L"Данил Дан\nДаша Даш\nДенис Де\n";
+
+		// for simplify debugging
+		bool check1 = res1 == waitRes1;
+		bool check2 = res2 == waitRes2;
+		return check1 && check2;
 		});
 }
 

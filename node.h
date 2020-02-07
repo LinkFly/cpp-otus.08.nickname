@@ -3,13 +3,15 @@
 #include <string>
 #include <bitset>
 #include <array>
+//#include <type_traits>
 
 using std::wstring;
 
-constexpr uint8_t size = 26 + 33;  // eng + rus
+// constexpr uint8_t size = 26 + 33;  // eng + rus
+constexpr uint16_t size = (256 * 256) - 1; // any byte (any codepage)
 
 struct Node {
-	using children_size = decltype(size);
+	using children_size_t = decltype(size);
 	wstring label;
 	bool isEnd{};
 	std::array<std::unique_ptr<Node>, size> children;
@@ -20,8 +22,10 @@ struct Node {
 		//if (ch == 0) {
 		//	return std::make_unique<Node>();
 		//}
-		checkChar(ch);
-		// TODO!!! Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
+
+		//checkChar(ch);
+
+		// TODO!!!!! Возможно Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
 		auto idx = getIdx(ch);
 		if (busySet[idx]) {
 			return children[idx];
@@ -33,10 +37,10 @@ struct Node {
 			return children[idx];
 		}
 	}
-	void forEach(std::function<void(std::unique_ptr<Node>&, uint8_t idx, bool isLast)> fn) {
+	void forEach(std::function<void(std::unique_ptr<Node>&, children_size_t idx, bool isLast)> fn) {
 		auto count = busySet.count();
 		decltype(count) order = 0;
-		for (uint8_t i = 0; i < static_cast<children_size>(busySet.size()); ++i) {
+		for (std::remove_const<children_size_t>::type i = 0; i < static_cast<children_size_t>(busySet.size()); ++i) {
 			if (busySet[i]) {
 				order++;
 				fn(children[i], i, order == count);
@@ -53,36 +57,39 @@ struct Node {
 	}
 
 	bool isNoChildren() {
-		return busySet.to_ullong() == (unsigned long)0;
+		//return busySet.to_ullong() == (unsigned long)0;
+		return busySet.count() == 0;
 	}
 
-	static int8_t getIdx(wchar_t wch) {
-		int8_t res;
-		if (isIn(wch, L'a', L'z')) {
-			res = wch - 'a';
-		}
-		else if (isIn(wch, L'а'/*rus*/, L'я')) {
-			res = wch - L'а'/*rus*/ + 26;
-		}
-		else if (wch == L'ё') {
-			res = 26 + 33;
-		}
-		else {
-			res = -1;
-		}
-		return res;
+	static children_size_t getIdx(wchar_t wch) {
+		return wch;
+		//int8_t res;
+		//if (isIn(wch, L'a', L'z')) {
+		//	res = wch - 'a';
+		//}
+		//else if (isIn(wch, L'а'/*rus*/, L'я')) {
+		//	res = wch - L'а'/*rus*/ + 26;
+		//}
+		//else if (wch == L'ё') {
+		//	res = 26 + 33;
+		//}
+		//else {
+		//	res = -1;
+		//}
+		//return res;
 	}
-	static wchar_t getChar(int8_t idx) {
-		if (idx < 26) {
-			return L'a' + idx;
-		}
-		else if (idx >= 26 && idx < 26 + 32) {
-			return L'а'/*rus*/ + (idx - 26);
-		}
-		else if (idx == 26 + 33) {
-			return L'ё';
-		}
-		else return L'\0';
+	static wchar_t getChar(children_size_t idx) {
+		return idx;
+		//if (idx < 26) {
+		//	return L'a' + idx;
+		//}
+		//else if (idx >= 26 && idx < 26 + 32) {
+		//	return L'а'/*rus*/ + (idx - 26);
+		//}
+		//else if (idx == 26 + 33) {
+		//	return L'ё';
+		//}
+		//else return L'\0';
 	}
 
 private:
