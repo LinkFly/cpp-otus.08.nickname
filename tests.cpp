@@ -170,6 +170,7 @@ void init_base_fixtures() {
 	//cout << "here\n";
 	//cout << wstring_to_utf8(L"ПриветПривет") << endl;
 	//wcout << L"wcout: " << L"ПриветПривет" << endl;
+	//
 }
 
 struct Init {
