@@ -165,9 +165,9 @@ bool name_short_lines_test() {
 }
 
 void init_base_fixtures() {
-//#ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
-//	systemSpecificInOutInit();
-//#endif
+#ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
+	systemSpecificInOutInit();
+#endif
 }
 
 struct Init {

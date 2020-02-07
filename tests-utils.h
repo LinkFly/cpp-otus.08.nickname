@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <codecvt>
 
 using std::string;
 using std::wstring;
@@ -12,6 +13,21 @@ using std::cout;
 const wstring testsNamesFile = L"../tests/names.txt";
 
 //// General utils
+// While don't using ...
+// convert UTF-8 string to wstring
+//std::wstring utf8_to_wstring(const std::string& str)
+//{
+//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+//	return myconv.from_bytes(str);
+//}
+
+// convert wstring to UTF-8 string
+std::string wstring_to_utf8(const std::wstring& str)
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+	return myconv.to_bytes(str);
+}
+
 wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff/*UTF16-BE*/) {
 	std::ifstream fin(filename, std::ios::in);
 	char buf[2];
@@ -23,7 +39,7 @@ wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff
 		fin.read(buf, 2);
 		wchar_t wch = toWChar(buf);
 		if (wch != checkCodepage) {
-			string sFile = string{ filename.begin(), filename.end() };
+			string sFile = wstring_to_utf8(filename);//  string{ filename.begin(), filename.end() };
 			std::cerr << "Bad codepage in file: " << sFile << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
 			exit(-1);
 		}
@@ -57,11 +73,11 @@ std::vector<wstring> readTestNames() {
 }
 
 void outFactAndWaitResults(const wstring& name, const wstring& res, const wstring& waitRes) {
-	const string sName(name.begin(), name.end());
-	const string sRes(res.begin(), res.end());
-	const string sWaitRes(waitRes.begin(), waitRes.end());
+	const string sName = wstring_to_utf8(name);// (name.begin(), name.end());
+	const string sRes = wstring_to_utf8(res);// (res.begin(), res.end());
+	const string sWaitRes = wstring_to_utf8(waitRes);// (waitRes.begin(), waitRes.end());
 	cout << "\nFailed checking: " << sName << "\n"
 		<< "Fact Res:\n---------\n" << sRes << "\n--------\n"
 		<< "Wait res:\n---------\n" << sWaitRes << "\n--------\n"
 		<< endl;
-}
+} 

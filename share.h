@@ -4,6 +4,9 @@
 	#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
+// For working std::codecvt_utf8<wchar_t> into c++17 without warning
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
 //// Configs
 #define AUTO_CHANGE_CODEPAGE_FOR_WIN 1
 //// end Configs
@@ -11,4 +14,9 @@
 #ifdef AUTO_CHANGE_CODEPAGE_FOR_WIN
 #include "codepage-manager.h"
 #endif
+
+//#include <string>
+//#include <codecvt>
+
+
 
