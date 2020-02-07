@@ -28,7 +28,9 @@ std::string wstring_to_utf8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 
-wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff/*UTF16-BE*/) {
+const wchar_t defaultCheckCodepage = 0xfeff/*UTF16-BE*/;
+
+wstring w_read_file_utf8_be_bom(string filename, wchar_t checkCodepage = defaultCheckCodepage) {
 	std::ifstream fin(filename, std::ios::in);
 	char buf[2];
 	auto toWChar = [](char* buf2ch) -> wchar_t {
@@ -39,8 +41,8 @@ wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff
 		fin.read(buf, 2);
 		wchar_t wch = toWChar(buf);
 		if (wch != checkCodepage) {
-			string sFile = wstring_to_utf8(filename);//  string{ filename.begin(), filename.end() };
-			std::cerr << "Bad codepage in file: " << sFile << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
+			//string sFile = wstring_to_utf8(filename);//  string{ filename.begin(), filename.end() };
+			std::cerr << "Bad codepage in file: " << filename << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
 			exit(-1);
 		}
 	}
@@ -52,6 +54,10 @@ wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = 0xfeff
 		res += toWChar(buf);
 	}
 	return res;
+}
+
+wstring w_read_file_utf8_be_bom(wstring filename, wchar_t checkCodepage = defaultCheckCodepage) {
+	return w_read_file_utf8_be_bom(wstring_to_utf8(filename), checkCodepage);
 }
 
 template <class Container>

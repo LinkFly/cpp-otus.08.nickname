@@ -6,9 +6,10 @@
 
 using std::wstring;
 
-constexpr unsigned size = 26 + 33;  // eng + rus
+constexpr uint8_t size = 26 + 33;  // eng + rus
 
 struct Node {
+	using children_size = decltype(size);
 	wstring label;
 	bool isEnd{};
 	std::array<std::unique_ptr<Node>, size> children;
@@ -32,10 +33,10 @@ struct Node {
 			return children[idx];
 		}
 	}
-	void forEach(std::function<void(std::unique_ptr<Node>&, int idx, bool isLast)> fn) {
+	void forEach(std::function<void(std::unique_ptr<Node>&, uint8_t idx, bool isLast)> fn) {
 		auto count = busySet.count();
 		decltype(count) order = 0;
-		for (size_t i = 0; i < busySet.size(); ++i) {
+		for (uint8_t i = 0; i < static_cast<children_size>(busySet.size()); ++i) {
 			if (busySet[i]) {
 				order++;
 				fn(children[i], i, order == count);
