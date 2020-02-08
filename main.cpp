@@ -27,9 +27,12 @@ int main() {;
 	//InOutInit inOutInit;
 	//inOutInit.init();
 	RadixTrie rtree;
-	rtree.isOutQuotes = false;
-	rtree.isOutSpecForDeps = false;
-	//rtree.isUpFstCharOnPrint = true;
+	/*rtree.isOutQuotes = false;*/
+	rtree.isOutQuotes = true;
+	/*rtree.isOutSpecForDeps = false;*/
+	rtree.isOutSpecForDeps = true;
+	//rtree.isUpFstCharOnPrint = true; // deprecated
+	rtree.isOutCodesInPrintTree = true;
 	rtree.sGap = "  ";
 
 	// TODO!!!!! Добавить обработку файла данных и потока ввода 
@@ -41,7 +44,8 @@ int main() {;
 		L"alesha",
 		L"maksim",
 		//L"Мxz",
-		//L"Маша",
+		L"Маша",
+		//L"Мама",
 		//L"АЛЕША",
 		//L"Алексей",
 		//L"Ыва"

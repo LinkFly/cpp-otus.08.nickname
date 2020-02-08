@@ -151,14 +151,24 @@ class RadixTrie {
 	string _prepareLabel(string& label, bool &isErr) {
 		isErr = false;
 		string res = "";
-		bool bSoutIsInit = false;
-		std::unique_ptr<std::ostringstream> sout;
-		auto maybe_init_sout = [&bSoutIsInit , &sout]() {
-			if (!bSoutIsInit) {
-				sout = std::make_unique<std::ostringstream>();
-				bSoutIsInit = true;
+		if (isOutCodesInPrintTree) {
+			auto sout = std::make_unique<std::ostringstream>();
+			for (uint8_t ch : label) {
+				(*sout) << "\\x" << std::hex << static_cast<int>(ch);
+				res += sout->str();
+				sout->str("");
 			}
-		};
+			return res;
+		}
+
+		//bool bSoutIsInit = false;
+		//std::unique_ptr<std::ostringstream> sout;
+		//auto maybe_init_sout = [&bSoutIsInit , &sout]() {
+		//	if (!bSoutIsInit) {
+		//		sout = std::make_unique<std::ostringstream>();
+		//		bSoutIsInit = true;
+		//	}
+		//};
 		for (uint8_t ch : label) {
 			if (ch <= 127) {
 				res += ch;
@@ -166,10 +176,6 @@ class RadixTrie {
 			else {
 				isErr = true;
 				return "";
-				//maybe_init_sout();
-				//(*sout) << "\\x" << std::hex << static_cast<int>(ch);
-				//string s = sout->str();
-				//res += sout->str();
 			}
 		}
 		return res;
@@ -187,7 +193,8 @@ class RadixTrie {
 			exit(-1);
 		}
 		string endMark = node->isEnd ? "$" : "";
-		out << (isOutQuotes ? "\"" : "") << preparedLabel << (isOutQuotes ? "\"" : "") << endMark << '\n';
+		//preparedLabel = "X";
+		out << (isOutQuotes ? "\"" : "") << preparedLabel << (isOutQuotes ? "\"" : "") << endMark << endl;
 		node->forEach([this, &out, &parentLines](
 			std::unique_ptr<Node>& node, [[maybe_unused]] Node::children_size_t idx, bool isLast) {
 			_printTree(out, node, false, isLast, parentLines);
@@ -219,7 +226,7 @@ class RadixTrie {
 			path = node->label;
 		}
 		string curLabel = label + node->label;
-		
+
 		if (node->isEnd) {
 			out << curLabel << " " << path << endl;
 			/*if (!isUpFstCharOnPrint) {
@@ -243,6 +250,7 @@ public:
 	/*bool isUpFstCharOnPrint = false;*/
 	string sGap = "\t";
 	bool isWriteSpecToBeginGap = true;
+	bool isOutCodesInPrintTree = false;
 
 	void append(const wstring& label) {
 		append(root, label);
