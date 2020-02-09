@@ -13,12 +13,8 @@ void setCodePage(const char codepage[]) {
 	system(setCodePageCmd.c_str());
 }
 
-void setCodePage(string& codepage) {
+void setCodePage(const string& codepage) {
 	setCodePage(codepage.c_str());
-}
-
-void setUTF8CodePage() {
-	setCodePage("65001");
 }
 
 string getStartedCodePage() {
@@ -37,10 +33,14 @@ string getStartedCodePage() {
 	return res;
 }
 
-void systemSpecificInOutInit() {
+const string utf8_codepage = "65001";
+
+void systemSpecificInOutInit(string codepage = utf8_codepage) {
 #ifdef _MSC_VER
+	if (codepage == "utf8")
+		codepage = utf8_codepage;
 	static auto codepageStarted = getStartedCodePage();
-	setUTF8CodePage();
+	setCodePage(codepage);
 	atexit([]() {
 		setCodePage(codepageStarted);
 		});

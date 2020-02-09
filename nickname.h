@@ -20,23 +20,16 @@ using std::wstring;
 
 using utf8_utils::readStartedPlusWholeSym;
 
-const wchar_t GAP_END = L'└';
-const wchar_t GAP_HERE = L'├';
-const wchar_t GAP_NEXT = L'│';
-
 class RadixTrie {
 	std::unique_ptr<Node> root;
-	const string gapEnd = RadixTrie::prepGap(GAP_END);
-	const string gapHere = prepGap(GAP_HERE);
-	const string gapNext = prepGap(GAP_NEXT);
+	const string gapEnd = u8"└";
+	const string gapHere = u8"├";
+	const string gapNext = u8"│";
 
 	static string prepGap(wchar_t gap) {
 		return wstring_to_utf8(wstring{ gap });
 	}
 
-	static void append(std::unique_ptr<Node>& node, const wstring& initLabel) {
-		append(node, wstring_to_utf8(initLabel));
-	}
 	static void append(std::unique_ptr<Node>& node, const string& initLabel) {
 		// prepare label
 		//wstring label = tolower(initLabel);
@@ -60,7 +53,6 @@ class RadixTrie {
 				append(node->getNode(label[0]), label);
 			}
 			return;
-
 		}
 
 		auto pair = std::mismatch(label.begin(), label.end(), node->label.begin(), node->label.end());
@@ -133,27 +125,13 @@ class RadixTrie {
 		}
 	}
 
-	string _prepareLabel(string& label, bool &isErr) {
-		isErr = false;
+	string _prepareLabel(string& label) {
 		string res = "";
-		if (isOutCodesInPrintTree) {
-			auto sout = std::make_unique<std::ostringstream>();
-			for (uint8_t ch : label) {
-				(*sout) << "\\x" << std::hex << static_cast<int>(ch);
-				res += sout->str();
-				sout->str("");
-			}
-			return res;
-		}
-
+		auto sout = std::make_unique<std::ostringstream>();
 		for (uint8_t ch : label) {
-			if (ch <= 127) {
-				res += ch;
-			}
-			else {
-				isErr = true;
-				return "";
-			}
+			(*sout) << "\\x" << std::hex << static_cast<int>(ch);
+			res += sout->str();
+			sout->str("");
 		}
 		return res;
 	}
@@ -163,14 +141,12 @@ class RadixTrie {
 			printGap(out, isLast, parentLines);
 			parentLines.push_back(!isLast);
 		}
-		bool isErr;
-		string preparedLabel = _prepareLabel(node->label, isErr);
-		if (isErr) {
-			error("------- ERROR _printTree: Not implemented for symbols with code > 127 ------- \n");
+		string preparedLabel;
+		if (isOutCodesInPrintTree) {
+			preparedLabel = _prepareLabel(node->label/*, isErr*/);
 		}
 		string endMark = node->isEnd ? "$" : "";
-		//preparedLabel = "X";
-		out << (isOutQuotes ? "\"" : "") << preparedLabel << (isOutQuotes ? "\"" : "") << endMark << endl;
+		out << (isOutQuotes ? "\"" : "") << (isOutCodesInPrintTree ? preparedLabel : node->label) << (isOutQuotes ? "\"" : "") << endMark << endl;
 		node->forEach([this, &out, &parentLines](
 			std::unique_ptr<Node>& node, [[maybe_unused]] Node::children_size_t idx, bool isLast) {
 			_printTree(out, node, false, isLast, parentLines);
@@ -216,7 +192,6 @@ class RadixTrie {
 			return started + string{ node->label[0] };
 		return readStartedPlusWholeSym(started, node->label);
 	}
-
 public:
 	// Config (set it after create instance)
 	bool isOutQuotes = false;
@@ -226,10 +201,6 @@ public:
 	bool isOutCodesInPrintTree = false;
 	bool isUseUTF8 = true;
 
-	// TODO!!! Remove deprecated
-	void append(const wstring& label) {
-		append(root, label);
-	}
 	void append(const string& label) {
 		append(root, label);
 	}
@@ -238,5 +209,10 @@ public:
 	}
 	void print(std::ostream& out = cout) {
 		_print(out, root, "", "");
+	}
+
+	/////////// Extra ///////////////
+	void append(const wstring& label) {
+		append(root, wstring_to_utf8(label));
 	}
 };

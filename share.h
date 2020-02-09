@@ -21,18 +21,23 @@
 
 /////////// Init code ////////////
 // For to run init code
-namespace _unused {
+namespace init {
 	struct init_t {
-		int f = 0;
-		init_t() {
-			setlocale(LC_ALL, "Russian_Russia.UTF8");
+		void run(const string& locale, const string& codepage) {
+			setlocale(LC_ALL, locale.c_str());
 #if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
-			systemSpecificInOutInit();
+			systemSpecificInOutInit(codepage);
 #endif
+
+//////// Reserv
 			//std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
 			//std::wcout.imbue(utf8_locale);
 		}
-	} init;
+	};
+	void run(const string& locale = "Russian_Russia.UTF8", string codepage = "utf8") {
+		init_t init;
+		init.run(locale, codepage);
+	}
 }
 
 std::string wstring_to_utf8(const std::wstring& str)

@@ -191,6 +191,7 @@ bool name_short_lines_test() {
 
 void init_base_fixtures() {
 	// Init code must be here
+	init::run();
 }
 
 struct Init {
