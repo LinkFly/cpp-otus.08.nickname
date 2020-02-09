@@ -15,7 +15,7 @@ set(TESTS_HEADERS
 	tests-utils.h
 	)
 set(DATA_FILES
-
+	Readme.md
 
 	)
 
