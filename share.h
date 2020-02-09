@@ -26,7 +26,7 @@ using std::string;
 // For to run init code
 namespace init {
 	struct init_t {
-		void run(const string& locale, const string& codepage) {
+		void run(const string& locale, [[maybe_unused]] const string& codepage) {
 			setlocale(LC_ALL, locale.c_str());
 #if defined(WIN32) && defined(AUTO_CHANGE_CODEPAGE_FOR_WIN)
 			systemSpecificInOutInit(codepage);

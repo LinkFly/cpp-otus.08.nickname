@@ -179,12 +179,12 @@ class RadixTrie {
 			auto lastPath = getPathPart(label, node);
 			out << curLabel << nameSep << lastPath << endl;
 		}
-		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, Node::children_size_t idx, [[maybe_unused]] bool isLast) {
+		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, [[maybe_unused]] Node::children_size_t idx, [[maybe_unused]] bool isLast) {
 			_print(out, node, curLabel, "");
 		});
 	}
 
-	string getPathPart(string& started, std::unique_ptr<Node>& node, Node::children_size_t idx = 0) {
+	string getPathPart(string& started, std::unique_ptr<Node>& node) {
 		if (!isUseUTF8) // maybe unusable (maybe only to get firstChar for not utf8)
 			return started + string{ node->label[0] };
 		return readStartedPlusWholeSym(started, node->label);
