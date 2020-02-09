@@ -26,6 +26,7 @@ class RadixTrie {
 	const string gapHere = u8"├";
 	const string gapNext = u8"│";
 
+	// Complexity: Linear in label.size()
 	static void append(std::unique_ptr<Node>& node, const string& label) {
 		if (node.get() == nullptr) {
 			node.reset(new Node{});
@@ -97,7 +98,6 @@ class RadixTrie {
 				// in newNode now - node, require fix name
 				auto& oldRoot = newNode;
 				node->setNode(oldRoot->label[0], oldRoot);
-
 			}
 		}
 	}
