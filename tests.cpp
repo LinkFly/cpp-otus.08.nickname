@@ -49,6 +49,8 @@ bool trivial_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		std::ostringstream sout, sout2;
 		RadixTrie rtree;
+		rtree.isOutSpecForDeps = false;
+		rtree.isOutSpecForDeps = false;
 		rtree.append(L"mark");
 		rtree.append(L"mast");
 		rtree.printTree(sout);
@@ -57,7 +59,15 @@ bool trivial_test() {
 		auto res2 = sout2.str();
 		string waitRes1 = "ma\n\trk$\n\tst$\n";
 		string waitRes2 = "mark mar\nmast mas\n";
-		return res1 == waitRes1 && res2 == waitRes2;
+		bool checkRes1 = res1 == waitRes1;
+		bool checkRes2 = res2 == waitRes2;
+		if (!checkRes1) {
+			outFactAndWaitResults("trivial_test", res1, waitRes1);
+		}
+		if (!checkRes2) {
+			outFactAndWaitResults("trivial_test", res2, waitRes2);
+		}
+		return checkRes1 && checkRes2;
 	});
 }
 
@@ -180,13 +190,7 @@ bool name_short_lines_test() {
 }
 
 void init_base_fixtures() {
-	//char s[] = u8"ПриветПривет";
-	//cout << "cout: " << s << endl;
-	//cout << "here\n";
-	//cout << wstring_to_utf8(L"ПриветПривет") << endl;
-	//wcout << L"wcout: " << L"ПриветПривет" << endl;
-	//
-	
+	// Init code must be here
 }
 
 struct Init {

@@ -53,8 +53,8 @@ int main(int argc, char** argv) {;
 			proc.processInput(fin);
 		}
 		else {
-			std::cerr << "file " << argv[2] << " does not exists" << endl;
-			return 1;
+			string errMsg = "file " + string{ argv[2] } +" does not exists";
+			error(errMsg);
 		}
 	}
 	else {

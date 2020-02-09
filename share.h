@@ -41,7 +41,13 @@ std::string wstring_to_utf8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 
-void error(const char* errMsg, int errCode = -1) {
+constexpr int defaultErrCode = -1;
+
+void error(const char* errMsg, int errCode = defaultErrCode) {
 	std::cerr << errMsg;
 	exit(errCode);
+}
+
+void error(const string& errMsg, int errCode = defaultErrCode) {
+	error(errMsg.c_str(), errCode);
 }

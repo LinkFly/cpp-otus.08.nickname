@@ -42,8 +42,9 @@ wstring w_read_file_utf8_be_bom(string filename, wchar_t checkCodepage = default
 		wchar_t wch = toWChar(buf);
 		if (wch != checkCodepage) {
 			//string sFile = wstring_to_utf8(filename);//  string{ filename.begin(), filename.end() };
-			std::cerr << "Bad codepage in file: " << filename << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
-			exit(-1);
+			std::ostringstream serrMsg;
+			serrMsg << "Bad codepage in file: " << filename << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
+			error(serrMsg.str());
 		}
 	}
 	while (true) {

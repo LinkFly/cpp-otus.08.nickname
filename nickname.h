@@ -166,8 +166,7 @@ class RadixTrie {
 		bool isErr;
 		string preparedLabel = _prepareLabel(node->label, isErr);
 		if (isErr) {
-			std::cerr << "------- ERROR _printTree: Not implemented for symbols with code > 127 ------- \n";
-			exit(-1);
+			error("------- ERROR _printTree: Not implemented for symbols with code > 127 ------- \n");
 		}
 		string endMark = node->isEnd ? "$" : "";
 		//preparedLabel = "X";
