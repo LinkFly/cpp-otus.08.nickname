@@ -24,7 +24,7 @@ struct Node {
 		checkChar(ch);
 
 		// TODO!!!!! Возможно Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
-		auto idx = getIdx(ch);
+		children_size_t& idx = ch;
 		if (busySet[idx]) {
 			return children[idx];
 		}
@@ -47,7 +47,7 @@ struct Node {
 	}
 
 	void setNode(IdxChar ch, std::unique_ptr<Node>& node) {
-		auto idx = getIdx(ch);
+		children_size_t& idx = ch;
 		if (node.get() != nullptr) {
 			busySet.set(idx);
 		}
@@ -55,46 +55,14 @@ struct Node {
 	}
 
 	bool isNoChildren() {
-		//return busySet.to_ullong() == (unsigned long)0;
 		return busySet.count() == 0;
 	}
 
-	static children_size_t getIdx(IdxChar wch) {
-		return wch;
-	}
-	static IdxChar getChar(children_size_t idx) {
-		return idx;
-		//if (idx < 26) {
-		//	return L'a' + idx;
-		//}
-		//else if (idx >= 26 && idx < 26 + 32) {
-		//	return L'а'/*rus*/ + (idx - 26);
-		//}
-		//else if (idx == 26 + 33) {
-		//	return L'ё';
-		//}
-		//else return L'\0';
-	}
-
 private:
-	//static bool isIn(IdxChar ch, wchar_t low, wchar_t high) {
-	//	return ch >= low && ch <= high;
-	//}
-
 	static void checkChar(IdxChar ch) {
 		// TODO! Correct error handling
-		//if (!(
-		//	isIn(ch, L'a', L'z')
-		//	//(ch >= L'a' && ch <= L'z') 
-		//	||
-		//	isIn(ch, L'а'/*rus*/, L'я')
-		//	//(ch >= L'а'/*rus*/ && ch <= L'я')
-		//	||
-		//	ch == L'ё'
-		//	)) {
 		if (ch == 0) {
-			std::cerr << "Bad char\n";
-			exit(1);
+			error("Bad char\n");
 		}
 	}
 };

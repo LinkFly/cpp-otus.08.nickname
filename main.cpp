@@ -79,5 +79,9 @@ int main(int argc, char** argv) {;
 	rtree.print();
 	rtree.printTree();
 
+	//unsigned __int64 test[4];
+	//unsigned __int64 test2;
+	//cout << "=== " << sizeof(test) << " ===\n";
+	//cout << "=== " << sizeof(test2) << " ===\n";
 	return 0;
 }
