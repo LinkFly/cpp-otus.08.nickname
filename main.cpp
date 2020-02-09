@@ -7,56 +7,76 @@
 #include <codecvt>
 #include <fstream>
 #include <vector>
+#include <filesystem>
+//#include <boost/filesystem.hpp>
 
 #include "nickname.h"
+
+namespace fs = std::filesystem;
+//namespace fs = boost::filesystem;
 
 using std::cout;
 using std::endl;
 using std::string;
 
-//std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
-//
-//struct InOutInit {
-//	
-//	void init(std::wostream& out = std::wcout) {
-//		out.imbue(utf8_locale);
-//	}
-//};
+template<class InStream, size_t bufsize = 20>
+bool readline(InStream& in, string& line) {
+	std::getline(in, line);
+	return in.eof();
+}
 
-int main() {;
-	//InOutInit inOutInit;
-	//inOutInit.init();
+class Processing {
+	RadixTrie& rtree;
+public:
+	Processing(RadixTrie& rtree) : rtree{ rtree } {}
+
+	template<typename InStream>
+	void processInput(InStream& in) {
+		string line;
+		bool isEof;
+		do {
+			isEof = readline(in, line);
+			if (line != "") rtree.append(line);
+		} while (!isEof);
+	}
+};
+
+int main(int argc, char** argv) {;
 	RadixTrie rtree;
-	/*rtree.isOutQuotes = false;*/
 	rtree.isOutQuotes = true;
-	/*rtree.isOutSpecForDeps = false;*/
-	rtree.isOutSpecForDeps = true;
-	//rtree.isUpFstCharOnPrint = true; // deprecated
-	rtree.isOutCodesInPrintTree = true;
 	rtree.sGap = "  ";
 
-	// TODO!!!!! Добавить обработку файла данных и потока ввода 
-	std::vector names = {
-		u8"aleksey",
-		u8"sasha",
-		u8"aleks",
-		u8"alek",
-		u8"alesha",
-		u8"maksim",
-		u8"Мxz",
-		u8"Маша",
-		u8"Мама",
-		u8"АЛЕША",
-		u8"Алексей",
-		u8"Ыва"
-	};
-
-	for (auto name : names) {
-		rtree.append(name);
+	Processing proc{ rtree };
+	if (argc == 2) {
+		if (fs::exists(argv[1])) {
+			std::ifstream fin(argv[1], std::ios::in);
+			proc.processInput(fin);
+		}
+		else {
+			std::cerr << "file " << argv[2] << " does not exists" << endl;
+			return 1;
+		}
+	}
+	else {
+		proc.processInput(std::cin);
 	}
 
+	/* Uncommented for checking to work with utf8 */
+	//std::vector names = {
+	//	u8"Мxz",
+	//	u8"Маша",
+	//	u8"Мама",
+	//	u8"АЛЕША",
+	//	u8"Алексей",
+	//	u8"Ыва"
+	//};
+	//for (auto name : names) {
+	//	rtree.append(name);
+	//}
+	//rtree.isOutCodesInPrintTree = true;
+	//////////////////////////////
+
 	rtree.print();
-	wcout << endl;
 	rtree.printTree();
 
 	return 0;

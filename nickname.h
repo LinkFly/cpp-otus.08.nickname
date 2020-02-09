@@ -9,14 +9,6 @@
 #include <sstream>
 #include <stdio.h>
 
-// TODO!!!!! Share code with tests-utils.h
-//#include <codecvt>
-//std::string wstring_to_utf8(const std::wstring& str)
-//{
-//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-//	return myconv.to_bytes(str);
-//}
-
 #include "node.h"
 #include "utf8-utils.h"
 
@@ -27,16 +19,6 @@ using std::string;
 using std::wstring;
 
 using utf8_utils::readStartedPlusWholeSym;
-
-//mstring upFirstChar(mstring str) {
-//	char upCh = std::towupper(str[0]);
-//	return mstring{upCh} + str.substr(1);
-//}
-//
-//mstring tolower(mstring label) {
-//	std::transform(label.begin(), label.end(), label.begin(), std::towlower);
-//	return label;
-//}
 
 const wchar_t GAP_END = L'└';
 const wchar_t GAP_HERE = L'├';
@@ -164,14 +146,6 @@ class RadixTrie {
 			return res;
 		}
 
-		//bool bSoutIsInit = false;
-		//std::unique_ptr<std::ostringstream> sout;
-		//auto maybe_init_sout = [&bSoutIsInit , &sout]() {
-		//	if (!bSoutIsInit) {
-		//		sout = std::make_unique<std::ostringstream>();
-		//		bSoutIsInit = true;
-		//	}
-		//};
 		for (uint8_t ch : label) {
 			if (ch <= 127) {
 				res += ch;
@@ -232,23 +206,14 @@ class RadixTrie {
 		if (node->isEnd) {
 			auto lastPath = getPathPart(label, node);
 			out << curLabel << " " << lastPath << endl;
-			/*if (!isUpFstCharOnPrint) {
-				out << curLabel << " " << path << endl;
-			}
-			else {
-				out << upFirstChar(curLabel) << " " << upFirstChar(path) << endl;
-			}*/
 		}
 		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, Node::children_size_t idx, [[maybe_unused]] bool isLast) {
-			/*string curPath = getPathPart(curLabel, node, idx);
-			_print(out, node, curLabel, curPath);*/
 			_print(out, node, curLabel, "");
 		});
 	}
 
 	string getPathPart(string& started, std::unique_ptr<Node>& node, Node::children_size_t idx = 0) {
 		if (!isUseUTF8) // maybe unusable (maybe only to get firstChar for not utf8)
-			/*return string{ Node::getChar(idx) };*/
 			return started + string{ node->label[0] };
 		return readStartedPlusWholeSym(started, node->label);
 	}
@@ -256,8 +221,7 @@ class RadixTrie {
 public:
 	// Config (set it after create instance)
 	bool isOutQuotes = false;
-	bool isOutSpecForDeps = false;
-	/*bool isUpFstCharOnPrint = false;*/
+	bool isOutSpecForDeps = true;
 	string sGap = "\t";
 	bool isWriteSpecToBeginGap = true;
 	bool isOutCodesInPrintTree = false;

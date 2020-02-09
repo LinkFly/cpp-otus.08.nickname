@@ -21,10 +21,6 @@ struct Node {
 	std::bitset<size> busySet = 0;
 
 	std::unique_ptr<Node>& getNode(IdxChar ch = 0) {
-		//if (ch == 0) {
-		//	return std::make_unique<Node>();
-		//}
-
 		checkChar(ch);
 
 		// TODO!!!!! Возможно Упразднить bitset - считать занятость/не занятость по наличию null/not null, в соотв. ячейке
@@ -65,20 +61,6 @@ struct Node {
 
 	static children_size_t getIdx(IdxChar wch) {
 		return wch;
-		//int8_t res;
-		//if (isIn(wch, L'a', L'z')) {
-		//	res = wch - 'a';
-		//}
-		//else if (isIn(wch, L'а'/*rus*/, L'я')) {
-		//	res = wch - L'а'/*rus*/ + 26;
-		//}
-		//else if (wch == L'ё') {
-		//	res = 26 + 33;
-		//}
-		//else {
-		//	res = -1;
-		//}
-		//return res;
 	}
 	static IdxChar getChar(children_size_t idx) {
 		return idx;
@@ -95,9 +77,9 @@ struct Node {
 	}
 
 private:
-	static bool isIn(IdxChar ch, wchar_t low, wchar_t high) {
-		return ch >= low && ch <= high;
-	}
+	//static bool isIn(IdxChar ch, wchar_t low, wchar_t high) {
+	//	return ch >= low && ch <= high;
+	//}
 
 	static void checkChar(IdxChar ch) {
 		// TODO! Correct error handling
