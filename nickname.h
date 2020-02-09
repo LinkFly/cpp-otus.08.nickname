@@ -26,10 +26,6 @@ class RadixTrie {
 	const string gapHere = u8"├";
 	const string gapNext = u8"│";
 
-	static string prepGap(wchar_t gap) {
-		return wstring_to_utf8(wstring{ gap });
-	}
-
 	static void append(std::unique_ptr<Node>& node, const string& label) {
 		if (node.get() == nullptr) {
 			auto newNode = std::make_unique<Node>();

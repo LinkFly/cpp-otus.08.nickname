@@ -12,22 +12,6 @@ using std::cout;
 
 const wstring testsNamesFile = L"../tests/names.txt";
 
-//// General utils
-// While don't using ...
-// convert UTF-8 string to wstring
-//std::wstring utf8_to_wstring(const std::string& str)
-//{
-//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-//	return myconv.from_bytes(str);
-//}
-
-// convert wstring to UTF-8 string
-//std::string wstring_to_utf8(const std::wstring& str)
-//{
-//	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-//	return myconv.to_bytes(str);
-//}
-
 const wchar_t defaultCheckCodepage = 0xfeff/*UTF16-BE*/;
 
 wstring w_read_file_utf8_be_bom(string filename, wchar_t checkCodepage = defaultCheckCodepage) {
@@ -41,7 +25,6 @@ wstring w_read_file_utf8_be_bom(string filename, wchar_t checkCodepage = default
 		fin.read(buf, 2);
 		wchar_t wch = toWChar(buf);
 		if (wch != checkCodepage) {
-			//string sFile = wstring_to_utf8(filename);//  string{ filename.begin(), filename.end() };
 			std::ostringstream serrMsg;
 			serrMsg << "Bad codepage in file: " << filename << ". Got: " << std::hex << wch << " Waited: " << std::hex << checkCodepage << endl << endl;
 			error(serrMsg.str());
