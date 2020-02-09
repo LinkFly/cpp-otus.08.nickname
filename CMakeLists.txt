@@ -8,6 +8,7 @@ set(HEADERS
 	share.h
 	logger.h
 	node.h
+	utf8-utils.h
 	nickname.h
 	codepage-manager.h
 	)
