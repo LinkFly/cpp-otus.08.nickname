@@ -70,21 +70,30 @@ bool utf8_test() {
 	return call_test(__PRETTY_FUNCTION__, []() {
 		std::ostringstream sout, sout2;
 		RadixTrie rtree;
+		rtree.isOutCodesInPrintTree = true;
+
 		rtree.append(L"Данил");
 		rtree.append(L"Денис");
 		rtree.append(L"Даша");
 
-		rtree.printTree(sout);
+		/*rtree.printTree(sout);*/
 		rtree.print(sout2);
-		auto res1 = sout.str();
+		/*auto res1 = sout.str();*/
 		auto res2 = sout2.str();
-		string waitRes1 = u8"Д\n\tа\n\t\tнил$\n\t\tша$\n\tенис$\n";
+		/*string waitRes1 = u8"Д\n\tа\n\t\tнил$\n\t\tша$\n\tенис$\n";*/
 		string waitRes2 = u8"Данил Дан\nДаша Даш\nДенис Де\n";
 
 		// for simplify debugging
-		bool check1 = res1 == waitRes1;
+		/*bool check1 = res1 == waitRes1;
+		if (!check1) {
+			outFactAndWaitResults("utf8_test", res1, waitRes1);
+		}*/
 		bool check2 = res2 == waitRes2;
-		return check1 && check2;
+		if (!check2) {
+			outFactAndWaitResults("utf8_test", res2, waitRes2);
+		}
+		/*return check1 && check2;*/
+		return check2;
 		});
 }
 
@@ -193,7 +202,7 @@ INIT(init_base_fixtures)
 BOOST_AUTO_TEST_CASE(test_of_nickname)
 {
 	BOOST_CHECK(trivial_test());
-	//BOOST_CHECK(utf8_test());
+	BOOST_CHECK(utf8_test());
 	BOOST_CHECK(simple_tree_test());
 	BOOST_CHECK(name_short_lines_test());
 	BOOST_CHECK(all_steps_test());

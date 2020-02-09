@@ -37,18 +37,18 @@ int main() {;
 
 	// TODO!!!!! Добавить обработку файла данных и потока ввода 
 	std::vector names = {
-		L"aleksey",
-		L"sasha",
-		L"aleks",
-		L"alek",
-		L"alesha",
-		L"maksim",
-		//L"Мxz",
-		L"Маша",
-		//L"Мама",
-		//L"АЛЕША",
-		//L"Алексей",
-		//L"Ыва"
+		u8"aleksey",
+		u8"sasha",
+		u8"aleks",
+		u8"alek",
+		u8"alesha",
+		u8"maksim",
+		u8"Мxz",
+		u8"Маша",
+		u8"Мама",
+		u8"АЛЕША",
+		u8"Алексей",
+		u8"Ыва"
 	};
 
 	for (auto name : names) {

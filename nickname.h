@@ -18,12 +18,15 @@
 //}
 
 #include "node.h"
+#include "utf8-utils.h"
 
 using std::cout;
 using std::wcout;
 using std::endl;
 using std::string;
 using std::wstring;
+
+using utf8_utils::readStartedPlusWholeSym;
 
 //mstring upFirstChar(mstring str) {
 //	char upCh = std::towupper(str[0]);
@@ -226,9 +229,9 @@ class RadixTrie {
 			path = node->label;
 		}
 		string curLabel = label + node->label;
-
 		if (node->isEnd) {
-			out << curLabel << " " << path << endl;
+			auto lastPath = getPathPart(label, node);
+			out << curLabel << " " << lastPath << endl;
 			/*if (!isUpFstCharOnPrint) {
 				out << curLabel << " " << path << endl;
 			}
@@ -237,10 +240,17 @@ class RadixTrie {
 			}*/
 		}
 		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, Node::children_size_t idx, [[maybe_unused]] bool isLast) {
-			char ch = Node::getChar(idx);
-			string curPath = curLabel + string{ ch };
-			_print(out, node, curLabel, curPath);
-			});
+			/*string curPath = getPathPart(curLabel, node, idx);
+			_print(out, node, curLabel, curPath);*/
+			_print(out, node, curLabel, "");
+		});
+	}
+
+	string getPathPart(string& started, std::unique_ptr<Node>& node, Node::children_size_t idx = 0) {
+		if (!isUseUTF8) // maybe unusable (maybe only to get firstChar for not utf8)
+			/*return string{ Node::getChar(idx) };*/
+			return started + string{ node->label[0] };
+		return readStartedPlusWholeSym(started, node->label);
 	}
 
 public:
@@ -251,8 +261,13 @@ public:
 	string sGap = "\t";
 	bool isWriteSpecToBeginGap = true;
 	bool isOutCodesInPrintTree = false;
+	bool isUseUTF8 = true;
 
+	// TODO!!! Remove deprecated
 	void append(const wstring& label) {
+		append(root, label);
+	}
+	void append(const string& label) {
 		append(root, label);
 	}
 	void printTree(std::ostream& out = cout) {
