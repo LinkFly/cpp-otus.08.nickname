@@ -28,16 +28,16 @@ class RadixTrie {
 
 	static void append(std::unique_ptr<Node>& node, const string& label) {
 		if (node.get() == nullptr) {
-			auto newNode = std::make_unique<Node>();
-			node.swap(newNode);
+			node.reset(new Node{});
 			node->label = label;
 			node->isEnd = true;
 			return;
 		}
 
 		bool isNoChildren = node->isNoChildren();
+		bool isLabelInNode = node->label != "";
 
-		if (node->label == "") {
+		if (!isLabelInNode) {
 			if (isNoChildren) {
 				node->label = label;
 				node->isEnd = true;
@@ -50,75 +50,59 @@ class RadixTrie {
 
 		auto pair = std::mismatch(label.begin(), label.end(), node->label.begin(), node->label.end());
 		// Iterators to not equal symbols
-		auto st1 = std::get<0>(pair);
-		auto st2 = std::get<1>(pair);
+		auto startNoEq1 = std::get<0>(pair);
+		auto startNoEq2 = std::get<1>(pair);
 		// Is equal
-		if ((st1 == label.end()) && (st2 == node->label.end())) {
+		if ((startNoEq1 == label.end()) && (startNoEq2 == node->label.end())) {
 			node->isEnd = true;
 			return;
 		}
 
-		auto pos1 = st1 - label.begin();
-		auto pos2 = st2 - node->label.begin();
-		// share part
-		string share = label.substr(0, pos1);
+		auto shareSize = startNoEq1 - label.begin();
+		string share = label.substr(0, shareSize);
 
 		// not equal parts
-		string restLabel = label.substr(pos1);
-		string restNode = node->label.substr(pos2);
+		string restLabel = label.substr(shareSize);
+		string restNode = node->label.substr(shareSize);
 
 		bool isShare = share != "";
-		bool isLabelInNode = node->label != "";
 		bool isRestInLabel = restLabel != "";
 		bool isRestInNode = restNode != "";
-		if (!isLabelInNode) {
-			if (isNoChildren) {
-				node->label = label;
-				node->isEnd = true;
-			}
-			else {
-				auto wch = label[0];
-				append(node->getNode(wch), label);
-			}
+
+		if (!isShare) {
+			// here will be node after swap
+			auto oldNode = std::make_unique<Node>();
+			oldNode.swap(node);
+			append(node->getNode(label[0]), label);
+			node->setNode(oldNode->label[0], oldNode);
 		}
-		else if (isLabelInNode) {
-			if (!isShare) {
-				// here will be node after swap
+		else {
+			if (!isRestInNode && isRestInLabel) {
+				append(node->getNode(restLabel[0]), restLabel);
+			}
+			else if (!isRestInLabel && isRestInNode) {
 				auto oldNode = std::make_unique<Node>();
 				oldNode.swap(node);
-				append(node->getNode(label[0]), label);
+				node->label = label;
+				node->isEnd = true;
+				oldNode->label = restNode;
 				node->setNode(oldNode->label[0], oldNode);
 			}
-			else {
-				if (!isRestInLabel || !isRestInNode) {
-					if (!isRestInLabel && isRestInNode) {
-						auto oldNode = std::make_unique<Node>();
-						oldNode.swap(node);
-						node->label = label;
-						node->isEnd = true;
-						oldNode->label = restNode;
-						node->setNode(oldNode->label[0], oldNode);
-					}
-					else if (!isRestInNode && isRestInLabel) {
-						append(node->getNode(restLabel[0]), restLabel);
-					}
-				}
-				else if (isRestInLabel && isRestInNode) {
-					auto newNode = std::make_unique<Node>();
-					newNode->label = share;
-					append(newNode->getNode(restLabel[0]), restLabel);
-					node->label = restNode;
-					node.swap(newNode);
-					// in newNode now - node, require fix name
-					auto& oldRoot = newNode;
-					node->setNode(oldRoot->label[0], oldRoot);
+			else if (isRestInLabel && isRestInNode) {
+				auto newNode = std::make_unique<Node>();
+				newNode->label = share;
+				append(newNode->getNode(restLabel[0]), restLabel);
+				node->label = restNode;
+				node.swap(newNode);
+				// in newNode now - node, require fix name
+				auto& oldRoot = newNode;
+				node->setNode(oldRoot->label[0], oldRoot);
 
-				}
 			}
 		}
 	}
 
-	string _prepareLabel(string& label) {
+	string _labelToHexCodes(string& label) {
 		string res = "";
 		auto sout = std::make_unique<std::ostringstream>();
 		for (uint8_t ch : label) {
@@ -129,14 +113,16 @@ class RadixTrie {
 		return res;
 	}
 
-	void _printTree(std::ostream& out, std::unique_ptr<Node>& node, bool topLevel = true, bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{}) {
+	void _printTree(std::ostream& out, std::unique_ptr<Node>& node,
+		bool topLevel = true, bool isLast = false, std::vector<bool> parentLines = std::vector<bool>{})
+	{
 		if (!topLevel) {
 			printGap(out, isLast, parentLines);
 			parentLines.push_back(!isLast);
 		}
 		string preparedLabel;
 		if (isOutCodesInPrintTree) {
-			preparedLabel = _prepareLabel(node->label/*, isErr*/);
+			preparedLabel = _labelToHexCodes(node->label);
 		}
 		string endMark = node->isEnd ? "$" : "";
 		out << (isOutQuotes ? "\"" : "") << (isOutCodesInPrintTree ? preparedLabel : node->label) << (isOutQuotes ? "\"" : "") << endMark << endl;
