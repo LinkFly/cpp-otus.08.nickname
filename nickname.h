@@ -30,10 +30,7 @@ class RadixTrie {
 		return wstring_to_utf8(wstring{ gap });
 	}
 
-	static void append(std::unique_ptr<Node>& node, const string& initLabel) {
-		// prepare label
-		//wstring label = tolower(initLabel);
-		const string& label = initLabel;
+	static void append(std::unique_ptr<Node>& node, const string& label) {
 		if (node.get() == nullptr) {
 			auto newNode = std::make_unique<Node>();
 			node.swap(newNode);
@@ -180,7 +177,7 @@ class RadixTrie {
 		string curLabel = label + node->label;
 		if (node->isEnd) {
 			auto lastPath = getPathPart(label, node);
-			out << curLabel << " " << lastPath << endl;
+			out << curLabel << nameSep << lastPath << endl;
 		}
 		node->forEach([this, &curLabel, &out](std::unique_ptr<Node>& node, Node::children_size_t idx, [[maybe_unused]] bool isLast) {
 			_print(out, node, curLabel, "");
@@ -197,6 +194,7 @@ public:
 	bool isOutQuotes = false;
 	bool isOutSpecForDeps = true;
 	string sGap = "\t";
+	string nameSep = " "; // maybe " - " for consistent with task description
 	bool isWriteSpecToBeginGap = true;
 	bool isOutCodesInPrintTree = false;
 	bool isUseUTF8 = true;
