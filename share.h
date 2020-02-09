@@ -18,6 +18,9 @@
 #include <locale>
 #include <codecvt>
 #include <iostream>
+#include <string>
+
+using std::string;
 
 /////////// Init code ////////////
 // For to run init code

@@ -26,13 +26,17 @@ set_target_properties(nickname tests PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 	)
 
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework filesystem REQUIRED)
+
+target_link_libraries(nickname
+	${Boost_LIBRARIES}
+)
 
 target_link_libraries(tests
 	${Boost_LIBRARIES}
 )
 
-set_target_properties(tests PROPERTIES
+set_target_properties(nickname tests PROPERTIES
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
 	LINK_DIRECTORIES ${Boost_LIBRARY_DIRS}
