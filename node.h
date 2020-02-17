@@ -5,7 +5,7 @@
 
 using std::string;
 
-const uint8_t size = 255; // any byte (any codepage)
+const uint8_t size = 255; // children of nodes count (for support any single byte encoding and utf8)
 
 struct Node {
 	using IdxChar = char;
