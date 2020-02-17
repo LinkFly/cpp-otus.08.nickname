@@ -35,6 +35,7 @@ namespace init {
 //////// Reserv
 			//std::locale utf8_locale = std::locale(std::locale{}, new std::codecvt_utf8<wchar_t>{});
 			//std::wcout.imbue(utf8_locale);
+			//std::cin.imbue(utf8_locale);
 		}
 	};
 	void run(const string& locale = "Russian_Russia.UTF8", string codepage = "utf8") {

@@ -71,27 +71,29 @@ int main(int argc, char** argv) {
 	}
 	rtree.isOutQuotes = true;
 	rtree.sGap = "  ";
-	std::unique_ptr<std::istream> pCurInput;
-	
+	std::unique_ptr<std::ifstream> pCurInput;
+	decltype(std::cin.rdbuf()) cinOldBuf = nullptr;
+
 	if (argc >= 2) {
 		if (fs::exists(argv[1])) {
 			pCurInput = std::make_unique<std::ifstream>(argv[1], std::ios::in);
+			cinOldBuf = std::cin.rdbuf();
+			std::cin.rdbuf(pCurInput->rdbuf());
 		}
 		else {
 			string errMsg = "file " + string{ argv[2] } +" does not exists";
 			error(errMsg);
 		}
 	}
-	else {
-		pCurInput.reset(&std::cin);
-	}
 
 	Processing proc{ rtree };
-	proc.processInput(*(pCurInput.get()));
+	proc.processInput(std::cin);
 
-	if (pCurInput.get() == &std::cin) {
-		pCurInput.reset();
+	if (pCurInput.get() != nullptr) {
+		std::cin.rdbuf(cinOldBuf);
+		pCurInput->close();
 	}
+
 	/* Uncommented for checking to work with utf8 */
 	//std::vector names = {
 	//	u8"Мxz",

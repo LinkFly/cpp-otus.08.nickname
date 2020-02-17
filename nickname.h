@@ -185,10 +185,14 @@ public:
 		append(root, label);
 	}
 	void printTree(std::ostream& out = cout) {
-		_printTree(out, root);
+		if (root.get() != nullptr) {
+			_printTree(out, root);
+		}
 	}
 	void print(std::ostream& out = cout) {
-		_print(out, root, "", "");
+		if (root.get() != nullptr) {
+			_print(out, root, "", "");
+		}
 	}
 
 	/////////// Extra ///////////////
