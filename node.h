@@ -2,10 +2,11 @@
 
 #include <string>
 #include <array>
+#include <limits>
 
 using std::string;
 
-const uint8_t size = 255; // children of nodes count (for support any single byte encoding and utf8)
+const uint8_t size = std::numeric_limits<uint8_t>::max(); // children of nodes count (for support any single byte encoding and utf8)
 
 struct Node {
 	using IdxChar = char;
