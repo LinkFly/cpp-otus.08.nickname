@@ -19,10 +19,14 @@ struct Node {
 	bool isEmpty(const std::unique_ptr<Node>& node) {
 		return node.get() == nullptr;
 	}
+	
+	children_size_t getIdx(IdxChar ch = 0) {
+		return reinterpret_cast<children_size_t&>(ch) - 1;
+	}
 
 	std::unique_ptr<Node>& getNode(IdxChar ch = 0) {
 		checkChar(ch);
-		children_size_t& idx = reinterpret_cast<children_size_t&>(ch);
+		children_size_t idx = getIdx(ch);
 		auto& curNode = children[idx];
 		if (!isEmpty(curNode)) {
 			return curNode;
@@ -34,7 +38,12 @@ struct Node {
 	}
 
 	std::unique_ptr<Node>& setNode(IdxChar ch, std::unique_ptr<Node>& node) {
-		children_size_t& idx = reinterpret_cast<children_size_t&>(ch);
+		checkChar(ch);
+		children_size_t idx = getIdx(ch);
+		return setNode(idx, node);
+	}
+
+	std::unique_ptr<Node>& setNode(children_size_t idx, std::unique_ptr<Node>& node) {
 		auto& curNode = children[idx];
 		if (!isEmpty(node)) {
 			if (isEmpty(curNode)) {
